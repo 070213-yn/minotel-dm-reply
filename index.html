@@ -226,7 +226,11 @@
         </label>
         <label class="chk">
           <input type="checkbox" id="c_info" checked>
-          <span><span class="t">発送先・希望カラーの返信依頼（①〜⑤）</span><span class="d">郵便番号・住所・電話・氏名・希望カラーをお願いする</span></span>
+          <span><span class="t">発送先の返信依頼（①〜）</span><span class="d">郵便番号・住所・電話・氏名をお願いする</span></span>
+        </label>
+        <label class="chk" id="color-row" style="margin-left:24px;">
+          <input type="checkbox" id="c_color" checked>
+          <span><span class="t">希望カラーも一緒に聞く</span><span class="d">事前にカラーを聞いている場合はオフにすると⑤が消えます</span></span>
         </label>
       </div>
 
@@ -357,6 +361,10 @@ document.getElementById('c_timing').addEventListener('change', function(){
 document.getElementById('c_post').addEventListener('change', function(){
   document.getElementById('sns-field').classList.toggle('hidden', !this.checked);
 });
+// 希望カラー行の開閉（発送先依頼がオフなら隠す）
+document.getElementById('c_info').addEventListener('change', function(){
+  document.getElementById('color-row').classList.toggle('hidden', !this.checked);
+});
 
 // ===== 文章生成 =====
 function nameLine(){
@@ -380,8 +388,12 @@ function buildTiming(){
 }
 
 function buildInfo(){
-  return 'もしPRいただける場合は以下をご返信いただけますと幸いです。\n' +
-    '①郵便番号\n②配送先住所\n③電話番号\n④氏名\n⑤希望カラー（ピュアホワイトとパステルブルーがございます）';
+  let t = 'もしPRいただける場合は以下をご返信いただけますと幸いです。\n' +
+    '①郵便番号\n②配送先住所\n③電話番号\n④氏名';
+  if(document.getElementById('c_color').checked){
+    t += '\n⑤希望カラー（ピュアホワイトとパステルブルーがございます）';
+  }
+  return t;
 }
 
 function buildOk(){
