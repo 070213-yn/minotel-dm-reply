@@ -311,6 +311,10 @@
           <input type="checkbox" id="c_post">
           <span><span class="t">SNS投稿・タグ付けのお願い</span><span class="d">紹介投稿で「@minotel_office」メンション＋「#minotel」「#PR」必須を依頼</span></span>
         </label>
+        <label class="chk">
+          <input type="checkbox" id="c_feature">
+          <span><span class="t">公式Instagramでの紹介をお願いする</span><span class="d">クレジット付きで公式IGに掲載＋ビフォアフター撮影（写真OK）を依頼</span></span>
+        </label>
       </div>
       <div class="subfield hidden" id="sns-field">
         <label>紹介してもらうSNS（任意）</label>
@@ -537,6 +541,11 @@ function buildOk(){
   if(document.getElementById('c_post').checked){
     const sns = (document.getElementById('sns').value||'').trim() || 'SNS';
     blocks.push('商品が届きましたら、' + sns + 'にてデスク環境と一緒にご紹介いただけますと幸いです。\nご紹介の際は「@minotel_office」のメンションと、ハッシュタグ「#minotel」「#PR」の2つを必ずご記載いただけますようお願いいたします。');
+  }
+
+  // 公式Instagramでの紹介＋ビフォアフター
+  if(document.getElementById('c_feature').checked){
+    blocks.push('また、今回ご提供させていただくスピーカーを使ったセットアップを、公式Instagramでもクレジット付きでご紹介させていただけないでしょうか？\nもし可能でしたら、スピーカーを置く前と置いた後のビフォーアフターをそれぞれ撮影いただけますと幸いです（基本的には写真でOKです）。\nスピーカーに合わせてセットアップを変えていただくのも全く問題ございません。ご検討のほどよろしくお願いいたします。');
   }
 
   // 投稿時期
