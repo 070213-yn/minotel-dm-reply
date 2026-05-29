@@ -226,6 +226,7 @@
         <div class="pat" data-p="media"><span class="em">💬</span>媒体確認<br>（打診）</div>
         <div class="pat active" data-p="ok"><span class="em">🩵</span>提供OK<br>（初回）</div>
         <div class="pat" data-p="ship"><span class="em">☁️</span>発送連絡<br>（情報受領後）</div>
+        <div class="pat" data-p="thanks"><span class="em">💕</span>お礼<br>（投稿後）</div>
         <div class="pat" data-p="hold"><span class="em">⏳</span>保留<br>（検討中）</div>
         <div class="pat" data-p="ng"><span class="em">🌧️</span>お断り</div>
       </div>
@@ -279,6 +280,10 @@
       <h2><span class="num">3</span>承諾・初回返信の内容</h2>
 
       <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="c_greeted">
+          <span><span class="t">2通目以降（挨拶を省略）</span><span class="d">媒体確認などで既にやり取り済みの相手向け。「はじめまして〜」を省き「ご返信ありがとうございます！」から始めます</span></span>
+        </label>
         <label class="chk">
           <input type="checkbox" id="c_apology">
           <span><span class="t">「返信が遅くなり申し訳ございません」を入れる</span><span class="d">返信までに少し時間が空いた相手向け</span></span>
@@ -407,6 +412,18 @@
       </div>
     </div>
 
+    <!-- お礼（投稿後）オプション -->
+    <div class="section thanksonly hidden" id="thanks-options">
+      <h2><span class="num">3</span>お礼（投稿後）の内容</h2>
+      <div class="hint" style="margin:0 0 12px;">紹介投稿をしてくれた相手へのお礼メッセージです。</div>
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="c_repost">
+          <span><span class="t">公式での紹介（リポスト）許可をお願いする</span><span class="d">相手の投稿を公式アカウントでクレジット付き紹介してよいか確認する一文を添える</span></span>
+        </label>
+      </div>
+    </div>
+
     <!-- お断りオプション -->
     <div class="section ngonly hidden" id="ng-options">
       <h2><span class="num">3</span>お断りの理由（任意）</h2>
@@ -490,6 +507,7 @@ function updateVisibility(){
   document.getElementById('media-options').classList.toggle('hidden', currentPattern !== 'media');
   document.querySelectorAll('.okonly').forEach(el=>el.classList.toggle('hidden', currentPattern !== 'ok'));
   document.getElementById('ship-options').classList.toggle('hidden', currentPattern !== 'ship');
+  document.getElementById('thanks-options').classList.toggle('hidden', currentPattern !== 'thanks');
   document.getElementById('ng-options').classList.toggle('hidden', currentPattern !== 'ng');
 }
 
@@ -571,17 +589,26 @@ function buildOk(){
   const nl = nameLine();
   if(nl) blocks.push(nl);
 
-  // 挨拶
+  // 挨拶（2通目以降は「はじめまして〜」を省略）
+  const greeted = document.getElementById('c_greeted').checked;
   let greet = '';
   if(document.getElementById('c_apology').checked){
     greet += '返信が遅くなりまして申し訳ございません。\n';
   }
-  greet += 'はじめまして、minotelの運営をしております' + ownerName() + 'と申します。\n';
-  greet += 'この度はご連絡いただき誠にありがとうございます。';
+  if(greeted){
+    greet += 'ご返信ありがとうございます！';
+  }else{
+    greet += 'はじめまして、minotelの運営をしております' + ownerName() + 'と申します。\n';
+    greet += 'この度はご連絡いただき誠にありがとうございます。';
+  }
   blocks.push(greet);
 
   // 受諾
-  blocks.push('まずは弊ブランドの製品をご紹介いただけるとのこと、ありがとうございます！ぜひお願いできればと思います！');
+  if(greeted){
+    blocks.push('それでは、ぜひ製品をご提供させていただければと思います✨');
+  }else{
+    blocks.push('まずは弊ブランドの製品をご紹介いただけるとのこと、ありがとうございます！ぜひお願いできればと思います！');
+  }
 
   // デスク写真へのコメント（お礼の続きなので接続詞は付けない）
   if(document.getElementById('c_photo').checked){
@@ -672,6 +699,22 @@ function buildShip(){
   return blocks.join('\n\n');
 }
 
+// お礼（投稿後）
+function buildThanks(){
+  const blocks = [];
+  const nl = nameLine();
+  if(nl) blocks.push(nl);
+
+  blocks.push('この度は素敵にご紹介いただき、誠にありがとうございました✨\n投稿を拝見しまして、デスクにとても馴染んでいて、見ているだけで嬉しくなりました…！☁️');
+
+  if(document.getElementById('c_repost').checked){
+    blocks.push('差し支えなければ、こちらの投稿を公式アカウントでもクレジット付きでご紹介させていただけますでしょうか？');
+  }
+
+  blocks.push('また機会がございましたら、ぜひご一緒できれば幸いです。\n今後ともminotelをどうぞよろしくお願いいたします！');
+  return blocks.join('\n\n');
+}
+
 // 保留・検討中
 function buildHold(){
   const blocks = [];
@@ -711,6 +754,7 @@ function render(){
   if(currentPattern === 'media') text = buildMedia();
   else if(currentPattern === 'ok') text = buildOk();
   else if(currentPattern === 'ship') text = buildShip();
+  else if(currentPattern === 'thanks') text = buildThanks();
   else if(currentPattern === 'hold') text = buildHold();
   else text = buildNg();
   document.getElementById('output').value = text;
@@ -753,8 +797,8 @@ document.getElementById('drive').addEventListener('input', function(){
 // ===== 入力クリア（応募者ごとの項目だけ。運営者名・素材リンクは保持）=====
 document.getElementById('resetBtn').addEventListener('click', function(){
   ['name','led','sns','prpoint'].forEach(id=>{ document.getElementById(id).value=''; });
-  ['c_apology','m_apology','m_photo','m_reply_img','c_photo','c_beforeafter','c_review',
-   'c_post','c_feature','c_timing','c_promo','c_prpoint']
+  ['c_greeted','c_apology','m_apology','m_photo','m_reply_img','c_photo','c_beforeafter','c_review',
+   'c_post','c_feature','c_timing','c_promo','c_prpoint','c_repost']
     .forEach(id=>{ document.getElementById(id).checked=false; });
   document.getElementById('c_info').checked = true;
   document.getElementById('color_mode').value = 'propose';
