@@ -390,6 +390,13 @@
           <span><span class="t">発送先情報の返信依頼</span><span class="d">郵便番号・住所・電話・氏名をお願いする（配送時のみ使用と明記）</span></span>
         </label>
       </div>
+
+      <div class="group-label">📖 製品マニュアル（公式サイト）</div>
+      <div class="field">
+        <label>製品マニュアルのURL</label>
+        <input type="text" id="manual" placeholder="例：https://minotel.jp/manual">
+        <div class="hint">文末に「公式サイトの製品マニュアルをご確認ください。」＋このURLが一緒に入ります。空欄なら {{製品マニュアルのURL}} のまま残ります。一度入れれば次回も保持されます。</div>
+      </div>
     </div>
 
     <!-- 発送連絡オプション -->
@@ -670,7 +677,8 @@ function buildOk(){
     blocks.push(info);
   }
 
-  blocks.push('製品の詳細な情報につきましては、後ほどまたお送りいたします。');
+  const manual = (document.getElementById('manual').value||'').trim() || '{{製品マニュアルのURL}}';
+  blocks.push('製品の詳細な情報につきましては、公式サイトの製品マニュアルをご確認ください。\n' + manual);
   blocks.push('以上、ご確認のほどよろしくお願いいたします！');
 
   // お礼は最後に持ってくる（初回＝挨拶ありのときのみ）
@@ -789,6 +797,8 @@ document.getElementById('copyBtn').addEventListener('click', function(){
     if(o !== null) document.getElementById('owner').value = o;
     const d = localStorage.getItem('minotel_drive');
     if(d !== null) document.getElementById('drive').value = d;
+    const m = localStorage.getItem('minotel_manual');
+    if(m !== null) document.getElementById('manual').value = m;
   }catch(e){}
 })();
 document.getElementById('owner').addEventListener('input', function(){
@@ -796,6 +806,9 @@ document.getElementById('owner').addEventListener('input', function(){
 });
 document.getElementById('drive').addEventListener('input', function(){
   try{ localStorage.setItem('minotel_drive', this.value); }catch(e){}
+});
+document.getElementById('manual').addEventListener('input', function(){
+  try{ localStorage.setItem('minotel_manual', this.value); }catch(e){}
 });
 
 // ===== 入力クリア（応募者ごとの項目だけ。運営者名・素材リンクは保持）=====
