@@ -598,8 +598,7 @@ function buildOk(){
   if(greeted){
     greet += 'ご返信ありがとうございます！';
   }else{
-    greet += 'はじめまして、minotelの運営をしております' + ownerName() + 'と申します。\n';
-    greet += 'この度はご連絡いただき誠にありがとうございます。';
+    greet += 'はじめまして、minotelの運営をしております' + ownerName() + 'と申します。';
   }
   blocks.push(greet);
 
@@ -647,9 +646,9 @@ function buildOk(){
     asks.push(target + 'に向けた、専用プロモーションコードをご用意させていただけないでしょうか？\n（Amazonにて10〜15%OFFになるプロモーションコードの予定です。）');
   }
 
-  // 2つ目以降に接続詞を付与（「また、」の連続を防ぎ、自然な流れにする）
+  // 2つ目以降に接続詞を付与（1つ目は接続詞なし。「また、」の連続を防ぎ、自然な流れにする）
   const conj = ['', 'また、', 'あわせて、', 'さらに、', '加えて、', 'そのうえで、'];
-  asks.forEach(function(t, i){ blocks.push((conj[i] || 'また、') + t); });
+  asks.forEach(function(t, i){ blocks.push((i < conj.length ? conj[i] : 'また、') + t); });
 
   // ----- カラーの伝え方 -----
   const colorMode = document.getElementById('color_mode').value;
@@ -673,6 +672,11 @@ function buildOk(){
 
   blocks.push('製品の詳細な情報につきましては、後ほどまたお送りいたします。');
   blocks.push('以上、ご確認のほどよろしくお願いいたします！');
+
+  // お礼は最後に持ってくる（初回＝挨拶ありのときのみ）
+  if(!greeted){
+    blocks.push('この度はご連絡いただき誠にありがとうございます。');
+  }
 
   return blocks.join('\n\n');
 }
