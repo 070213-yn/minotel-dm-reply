@@ -545,7 +545,6 @@ document.getElementById('pw').addEventListener('keydown', e=>{ if(e.key==='Enter
 const TPL_DEFS = [
   {g:'共通', k:'common_apology',       l:'返信が遅れたおわび', v:'返信が遅くなりまして申し訳ございません。'},
   {g:'共通', k:'common_hajimemashite', l:'初回の名乗り（{owner}）', v:'はじめまして、minotelの運営をしております{owner}と申します。'},
-  {g:'共通', k:'common_thanks',        l:'ご連絡へのお礼（媒体確認は冒頭／提供OKは末尾）', v:'この度はご連絡いただき誠にありがとうございます。'},
 
   {g:'媒体確認（打診）', k:'media_photo',       l:'デスク写真へのお礼', v:'また、素敵なデスク写真もありがとうございます！'},
   {g:'媒体確認（打診）', k:'media_reply_photo', l:'リプ画像のとき写真お礼の前置き', v:'素敵なデスク写真もありがとうございます！'},
@@ -676,7 +675,7 @@ function buildMedia(){
 
   let greet = '';
   if(document.getElementById('m_apology').checked) greet += tpl('common_apology') + '\n';
-  greet += tpl('common_hajimemashite', {owner: ownerName()}) + '\n' + tpl('common_thanks');
+  greet += tpl('common_hajimemashite', {owner: ownerName()});
   blocks.push(greet);
 
   const mPhoto = document.getElementById('m_photo').checked;
@@ -766,9 +765,6 @@ function buildOk(){
   blocks.push(tpl('ok_manual', {manual: manual}));
 
   blocks.push(tpl('ok_close'));
-
-  // お礼は最後に（初回＝挨拶ありのときのみ）
-  if(!greeted) blocks.push(tpl('common_thanks'));
 
   return blocks.join('\n\n');
 }
