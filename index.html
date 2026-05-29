@@ -708,32 +708,6 @@ function buildOk(){
     blocks.push(tpl('ok_photo', {led: led}));
   }
 
-  // お願い事を集めて、組み合わせに応じた接続詞でつなぐ
-  const asks = [];
-  const feature = document.getElementById('c_feature').checked;
-  const ba = document.getElementById('c_beforeafter').checked;
-  const rv = document.getElementById('c_review').checked;
-  const post = document.getElementById('c_post').checked;
-  const timing = document.getElementById('c_timing').checked;
-  const promo = document.getElementById('c_promo').checked;
-
-  if(rv) asks.push(tpl('ask_review'));
-  if(ba && !feature) asks.push(tpl('ask_beforeafter')); // 公式SNS紹介に含まれる場合は重複回避
-  if(post){
-    const sns = (document.getElementById('sns').value||'').trim() || 'SNS';
-    asks.push(tpl('ask_post', {sns: sns}));
-  }
-  if(feature) asks.push(tpl('ask_feature'));
-  if(timing) asks.push(tpl('ask_timing', {when: timingWhen()}));
-  if(promo){
-    const target = nl ? (nl + 'のフォロワー様') : 'フォロワー様';
-    asks.push(tpl('ask_promo', {target: target}));
-  }
-
-  // 1つ目は接続詞なし。2つ目以降に「また、」などを付与
-  const conj = ['', 'また、', 'あわせて、', 'さらに、', '加えて、', 'そのうえで、'];
-  asks.forEach(function(t, i){ blocks.push((i < conj.length ? conj[i] : 'また、') + t); });
-
   // カラーの伝え方
   const colorMode = document.getElementById('color_mode').value;
   const pc = document.getElementById('propose_color').value;
@@ -747,6 +721,32 @@ function buildOk(){
     if(colorMode === 'ask') info += '\n' + tpl('info_color5');
     blocks.push(info);
   }
+
+  // ご紹介・お願い事（カラー→発送先情報のあとにまとめる）。組み合わせに応じた接続詞でつなぐ
+  const asks = [];
+  const feature = document.getElementById('c_feature').checked;
+  const ba = document.getElementById('c_beforeafter').checked;
+  const rv = document.getElementById('c_review').checked;
+  const post = document.getElementById('c_post').checked;
+  const timing = document.getElementById('c_timing').checked;
+  const promo = document.getElementById('c_promo').checked;
+
+  if(post){
+    const sns = (document.getElementById('sns').value||'').trim() || 'SNS';
+    asks.push(tpl('ask_post', {sns: sns}));
+  }
+  if(feature) asks.push(tpl('ask_feature'));
+  if(rv) asks.push(tpl('ask_review'));
+  if(ba && !feature) asks.push(tpl('ask_beforeafter')); // 公式SNS紹介に含まれる場合は重複回避
+  if(timing) asks.push(tpl('ask_timing', {when: timingWhen()}));
+  if(promo){
+    const target = nl ? (nl + 'のフォロワー様') : 'フォロワー様';
+    asks.push(tpl('ask_promo', {target: target}));
+  }
+
+  // 1つ目は接続詞なし。2つ目以降に「また、」などを付与
+  const conj = ['', 'また、', 'あわせて、', 'さらに、', '加えて、', 'そのうえで、'];
+  asks.forEach(function(t, i){ blocks.push((i < conj.length ? conj[i] : 'また、') + t); });
 
   // 製品マニュアル案内
   const manual = (document.getElementById('manual').value||'').trim() || '{{製品マニュアルのURL}}';
