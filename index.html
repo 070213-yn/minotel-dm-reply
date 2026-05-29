@@ -250,6 +250,8 @@
         <label>運営者名（署名）</label>
         <input type="text" id="owner" value="近藤">
       </div>
+      <button class="btn" id="resetBtn" style="background:var(--panel2); color:var(--blue-strong); border:1.5px solid var(--blue-soft); width:100%; margin-top:4px;">入力をクリア（次の人へ）</button>
+      <div class="hint">相手の名前やチェックをリセットします（運営者名・素材リンクは残ります）。</div>
     </div>
 
     <!-- 媒体確認（打診）オプション -->
@@ -260,6 +262,14 @@
         <label class="chk">
           <input type="checkbox" id="m_apology">
           <span><span class="t">「返信が遅くなり申し訳ございません」を入れる</span><span class="d">返信までに少し時間が空いた相手向け</span></span>
+        </label>
+        <label class="chk">
+          <input type="checkbox" id="m_photo">
+          <span><span class="t">デスク写真へのお礼を入れる</span><span class="d">写真を添付してくれた相手向け（「素敵なデスク写真もありがとうございます！」）</span></span>
+        </label>
+        <label class="chk">
+          <input type="checkbox" id="m_reply_img">
+          <span><span class="t">リプで画像を送ってくれたパターン</span><span class="d">DMで画像が送れず、リプライで写真を送ってくれた相手向け（拝見しました＋お手数のおわび）</span></span>
         </label>
       </div>
     </div>
@@ -288,35 +298,18 @@
         <div class="hint">空欄なら「{{LEDカラー}}」のまま残るので、後で手直しできます。</div>
       </div>
 
-      <div class="group-label">🎨 提供カラーの伝え方</div>
-      <div class="field">
-        <select id="color_mode">
-          <option value="propose">こちらから提案する（「〇〇でよろしいですか？」）</option>
-          <option value="received">相手から希望カラーを聞いている（「ご希望の〇〇で」）</option>
-          <option value="either">相手が「どちらでもOK」（こちらで〇〇を用意）</option>
-          <option value="ask">希望を聞く（情報依頼に「⑤希望カラー」を追加）</option>
-          <option value="none">カラーには触れない</option>
-        </select>
-      </div>
-      <div class="subfield" id="propose-field">
-        <label>カラー（提案／確定する色）</label>
-        <select id="propose_color">
-          <option value="ピュアホワイト">ピュアホワイト</option>
-          <option value="パステルブルー">パステルブルー</option>
-        </select>
-      </div>
-
-      <div class="group-label">📸 PRのお願い（条件）　※チェックすると「条件ありパターン」になります</div>
+      <div class="group-label">📸 ご紹介内容のお願い</div>
       <div class="checks">
-        <label class="chk">
-          <input type="checkbox" id="c_beforeafter">
-          <span><span class="t">ビフォアフターのお願い</span><span class="d">スピーカーを置く前後が分かる写真・動画を入れてもらう</span></span>
-        </label>
         <label class="chk">
           <input type="checkbox" id="c_review">
           <span><span class="t">レビューの方向性のお願い</span><span class="d">音質よりインテリア性を重視・マイナス表現は避けてもらう</span></span>
         </label>
+        <label class="chk">
+          <input type="checkbox" id="c_beforeafter">
+          <span><span class="t">ビフォアフターのお願い</span><span class="d">スピーカーを置く前後が分かる写真・動画を入れてもらう</span></span>
+        </label>
       </div>
+      <div class="hint">「公式Instagramでの紹介」をオンにするとビフォアフター撮影の依頼も含まれるため、その場合はビフォアフター単体は自動で省略されます。</div>
 
       <div class="group-label">📣 投稿・タグ付けのお願い</div>
       <div class="checks">
@@ -365,6 +358,24 @@
           <input type="checkbox" id="c_promo">
           <span><span class="t">専用プロモーションコードを提案する</span><span class="d">相手のフォロワー向けに、Amazonで10〜15%OFFになる専用コードを用意する提案</span></span>
         </label>
+      </div>
+
+      <div class="group-label">🎨 提供カラーの伝え方</div>
+      <div class="field">
+        <select id="color_mode">
+          <option value="propose">こちらから提案する（「〇〇でよろしいですか？」）</option>
+          <option value="received">相手から希望カラーを聞いている（「ご希望の〇〇で」）</option>
+          <option value="either">相手が「どちらでもOK」（こちらで〇〇を用意）</option>
+          <option value="ask">希望を聞く（情報依頼に「⑤希望カラー」を追加）</option>
+          <option value="none">カラーには触れない</option>
+        </select>
+      </div>
+      <div class="subfield" id="propose-field">
+        <label>カラー（提案／確定する色）</label>
+        <select id="propose_color">
+          <option value="ピュアホワイト">ピュアホワイト</option>
+          <option value="パステルブルー">パステルブルー</option>
+        </select>
       </div>
 
       <div class="group-label">📮 発送先情報の依頼</div>
@@ -514,11 +525,11 @@ function ownerName(){
   return (document.getElementById('owner').value||'').trim() || '担当';
 }
 
-function buildTiming(){
+function buildTimingCore(){
   const month = document.getElementById('t_month').value;
   const period = document.getElementById('t_period').value;
   const when = (period === '頃') ? (month + '月頃') : (month + '月' + period + '頃');
-  return 'また、投稿の時期につきまして、もし可能であれば' + when +
+  return '投稿の時期につきまして、もし可能であれば' + when +
     'にご投稿いただけますと嬉しいです。\n（あくまで「できれば」のお願いですので、ご都合の良いタイミングで問題ございません。）';
 }
 
@@ -535,6 +546,18 @@ function buildMedia(){
   greet += 'はじめまして、minotelの運営をしております' + ownerName() + 'と申します。\n';
   greet += 'この度はご連絡いただき誠にありがとうございます。';
   blocks.push(greet);
+
+  // デスク写真へのお礼／リプで画像を送ってくれたパターン
+  const mPhoto = document.getElementById('m_photo').checked;
+  const mReply = document.getElementById('m_reply_img').checked;
+  if(mReply){
+    let r = '';
+    if(mPhoto) r += '素敵なデスク写真もありがとうございます！\n';
+    r += 'DMでは画像をお送りいただけなかったとのことで、リプライにてお送りいただいたお写真も拝見させていただきました！\nお手数をおかけして申し訳ございませんでした。';
+    blocks.push(r);
+  }else if(mPhoto){
+    blocks.push('また、素敵なデスク写真もありがとうございます！');
+  }
 
   blocks.push('ご紹介についてですが、ご提供させていただいた場合は、どの媒体でご紹介いただけますでしょうか？\n（X / Instagram / TikTok / YouTube など）');
   blocks.push('差し支えなければ教えていただけますと幸いです。\n何卒よろしくお願いいたします！');
@@ -557,62 +580,52 @@ function buildOk(){
   greet += 'この度はご連絡いただき誠にありがとうございます。';
   blocks.push(greet);
 
-  blocks.push('まずは弊ブランドの製品をご紹介いただけるとのこと、ありがとうございます！ぜひお願い出来ればと思います！');
+  // 受諾
+  blocks.push('まずは弊ブランドの製品をご紹介いただけるとのこと、ありがとうございます！ぜひお願いできればと思います！');
 
-  // デスク写真コメント
+  // デスク写真へのコメント（お礼の続きなので接続詞は付けない）
   if(document.getElementById('c_photo').checked){
     const led = (document.getElementById('led').value||'').trim() || '{{LEDカラー}}';
-    blocks.push('また、大変素敵なデスク写真もありがとうございます✨\n雲スピーカーのLEDは' + led + 'にも設定できますので、とても相性が良いと思います…！☁️');
+    blocks.push('大変素敵なデスク写真もありがとうございます✨\n雲スピーカーのLEDは' + led + 'にも設定できますので、とても相性が良いと思います…！☁️');
   }
 
-  // PR条件
+  // ----- お願い事を集めて、組み合わせに応じた接続詞でつなぐ -----
+  const asks = [];
+  const feature = document.getElementById('c_feature').checked;
   const ba = document.getElementById('c_beforeafter').checked;
   const rv = document.getElementById('c_review').checked;
-  if(ba || rv){
-    let c = '差し支えなければ、以下の点についてもご協力いただけますと幸いです。';
-    if(ba){
-      c += '\n\n・デスクの雰囲気がスピーカーだけでどのくらい変わるかが分かりやすいよう、スピーカーを置く前と置いた後のビフォアフターが分かる動画や写真を入れていただく';
-    }
-    if(rv){
-      c += '\n\n・本製品は音質よりもインテリア性を重視した製品のため、主に外観や操作性について言及いただけますと嬉しいです。\n　音質に触れる場合は、極力マイナスな言葉は避けていただけますと幸いです。（× 低音が弱い・良くない → 〇 低音は控えめ など）';
-    }
-    blocks.push(c);
-  }
+  const post = document.getElementById('c_post').checked;
+  const timing = document.getElementById('c_timing').checked;
+  const promo = document.getElementById('c_promo').checked;
 
-  // SNS投稿・タグ付け
-  if(document.getElementById('c_post').checked){
+  if(rv){
+    asks.push('本製品は音質よりもインテリア性を重視した製品のため、ご紹介の際は主に外観や操作性について言及いただけますと幸いです。\n音質に触れる場合は、極力マイナスな言葉は避けていただけますと幸いです。（× 低音が弱い・良くない → 〇 低音は控えめ など）');
+  }
+  // ビフォアフター単体（公式IG紹介に含まれる場合は重複を避けて省略）
+  if(ba && !feature){
+    asks.push('スピーカーを置く前と置いた後で雰囲気がどのくらい変わるかが分かりやすいよう、ビフォーアフターが分かる動画や写真を入れていただけますと嬉しいです。');
+  }
+  if(post){
     const sns = (document.getElementById('sns').value||'').trim() || 'SNS';
-    blocks.push('商品が届きましたら、' + sns + 'にてデスク環境と一緒にご紹介いただけますと幸いです。\nご紹介の際は「@minotel_office」のメンションと、ハッシュタグ「#minotel」「#PR」の2つを必ずご記載いただけますようお願いいたします。');
+    asks.push('商品が届きましたら、' + sns + 'にてデスク環境と一緒にご紹介いただけますと幸いです。\nご紹介の際は「@minotel_office」のメンションと、ハッシュタグ「#minotel」「#PR」の2つを必ずご記載いただけますようお願いいたします。');
+  }
+  if(feature){
+    asks.push('今回ご提供させていただくスピーカーを使ったセットアップを、公式Instagramでもクレジット付きでご紹介させていただけないでしょうか？\nもし可能でしたら、スピーカーを置く前と置いた後のビフォーアフターをそれぞれ撮影いただけますと幸いです（基本的には写真でOKです）。\nスピーカーに合わせてセットアップを変えていただくのも全く問題ございません。');
+  }
+  if(timing){
+    asks.push(buildTimingCore());
+  }
+  if(promo){
+    const target = nl ? (nl + 'のフォロワー様') : 'フォロワー様';
+    asks.push(target + 'に向けた、専用プロモーションコードをご用意させていただけないでしょうか？\n（Amazonにて10〜15%OFFになるプロモーションコードの予定です。）');
   }
 
-  // 公式Instagramでの紹介＋ビフォアフター
-  if(document.getElementById('c_feature').checked){
-    blocks.push('また、今回ご提供させていただくスピーカーを使ったセットアップを、公式Instagramでもクレジット付きでご紹介させていただけないでしょうか？\nもし可能でしたら、スピーカーを置く前と置いた後のビフォーアフターをそれぞれ撮影いただけますと幸いです（基本的には写真でOKです）。\nスピーカーに合わせてセットアップを変えていただくのも全く問題ございません。ご検討のほどよろしくお願いいたします。');
-  }
+  // 2つ目以降に接続詞を付与（「また、」の連続を防ぎ、自然な流れにする）
+  const conj = ['', 'また、', 'あわせて、', 'さらに、', '加えて、', 'そのうえで、'];
+  asks.forEach(function(t, i){ blocks.push((conj[i] || 'また、') + t); });
 
-  // 投稿時期
-  if(document.getElementById('c_timing').checked){
-    blocks.push(buildTiming());
-  }
-
-  // 専用プロモーションコードの提案
-  if(document.getElementById('c_promo').checked){
-    const nm = nameLine();
-    const target = nm ? (nm + 'のフォロワー様') : 'フォロワー様';
-    blocks.push('また、' + target + 'に向けた、専用プロモーションコードをご用意させていただけないでしょうか？\n（Amazonにて10〜15%OFFになるプロモーションコードの予定です。）');
-  }
-
-  // 発送先情報の依頼
+  // ----- カラーの伝え方 -----
   const colorMode = document.getElementById('color_mode').value;
-  if(document.getElementById('c_info').checked){
-    let info = 'ご提供にあたり、以下のご情報をご返信いただけますでしょうか？\n（頂戴したご情報は配送時のみに使用いたします）\n\n①郵便番号\n②配送先住所\n③電話番号\n④氏名';
-    if(colorMode === 'ask'){
-      info += '\n⑤希望カラー（ピュアホワイトとパステルブルーがございます）';
-    }
-    blocks.push(info);
-  }
-
-  // カラーの伝え方
   const pc = document.getElementById('propose_color').value;
   if(colorMode === 'propose'){
     blocks.push('提供させていただくカラーについては' + pc + 'でよろしいでしょうか？（ピュアホワイトとパステルブルーがございます）');
@@ -620,6 +633,15 @@ function buildOk(){
     blocks.push('カラーは、ご希望いただきました' + pc + 'にてご用意させていただきますね！');
   }else if(colorMode === 'either'){
     blocks.push('カラーはどちらでも、とのことでしたので、' + pc + 'にてご用意させていただきますね！');
+  }
+
+  // ----- 発送先情報の依頼 -----
+  if(document.getElementById('c_info').checked){
+    let info = 'ご提供にあたり、以下のご情報をご返信いただけますでしょうか？\n（頂戴したご情報は配送時のみに使用いたします）\n\n①郵便番号\n②配送先住所\n③電話番号\n④氏名';
+    if(colorMode === 'ask'){
+      info += '\n⑤希望カラー（ピュアホワイトとパステルブルーがございます）';
+    }
+    blocks.push(info);
   }
 
   blocks.push('製品の詳細な情報につきましては、後ほどまたお送りいたします。');
@@ -710,6 +732,40 @@ document.getElementById('copyBtn').addEventListener('click', function(){
     c.classList.add('show');
     setTimeout(()=>c.classList.remove('show'), 1500);
   }).catch(()=>{ document.execCommand('copy'); });
+});
+
+// ===== 運営者名・素材リンクをブラウザに記憶（次回も保持）=====
+(function(){
+  try{
+    const o = localStorage.getItem('minotel_owner');
+    if(o !== null) document.getElementById('owner').value = o;
+    const d = localStorage.getItem('minotel_drive');
+    if(d !== null) document.getElementById('drive').value = d;
+  }catch(e){}
+})();
+document.getElementById('owner').addEventListener('input', function(){
+  try{ localStorage.setItem('minotel_owner', this.value); }catch(e){}
+});
+document.getElementById('drive').addEventListener('input', function(){
+  try{ localStorage.setItem('minotel_drive', this.value); }catch(e){}
+});
+
+// ===== 入力クリア（応募者ごとの項目だけ。運営者名・素材リンクは保持）=====
+document.getElementById('resetBtn').addEventListener('click', function(){
+  ['name','led','sns','prpoint'].forEach(id=>{ document.getElementById(id).value=''; });
+  ['c_apology','m_apology','m_photo','m_reply_img','c_photo','c_beforeafter','c_review',
+   'c_post','c_feature','c_timing','c_promo','c_prpoint']
+    .forEach(id=>{ document.getElementById(id).checked=false; });
+  document.getElementById('c_info').checked = true;
+  document.getElementById('color_mode').value = 'propose';
+  // サブ項目の開閉を初期状態へ
+  document.getElementById('led-field').classList.add('hidden');
+  document.getElementById('sns-field').classList.add('hidden');
+  document.getElementById('timing-box').classList.add('hidden');
+  document.getElementById('prpoint-field').classList.add('hidden');
+  document.getElementById('propose-field').classList.remove('hidden');
+  document.getElementById('name').focus();
+  render();
 });
 
 updateVisibility();
