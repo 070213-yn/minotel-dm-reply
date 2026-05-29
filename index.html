@@ -279,12 +279,14 @@
       <div class="field">
         <select id="color_mode">
           <option value="propose">こちらから提案する（「〇〇でよろしいですか？」）</option>
+          <option value="received">相手から希望カラーを聞いている（「ご希望の〇〇で」）</option>
+          <option value="either">相手が「どちらでもOK」（こちらで〇〇を用意）</option>
           <option value="ask">希望を聞く（情報依頼に「⑤希望カラー」を追加）</option>
           <option value="none">カラーには触れない</option>
         </select>
       </div>
       <div class="subfield" id="propose-field">
-        <label>提案するカラー</label>
+        <label>カラー（提案／確定する色）</label>
         <select id="propose_color">
           <option value="ピュアホワイト">ピュアホワイト</option>
           <option value="パステルブルー">パステルブルー</option>
@@ -468,7 +470,9 @@ document.getElementById('c_prpoint').addEventListener('change', function(){
   document.getElementById('prpoint-field').classList.toggle('hidden', !this.checked);
 });
 document.getElementById('color_mode').addEventListener('change', function(){
-  document.getElementById('propose-field').classList.toggle('hidden', this.value !== 'propose');
+  // カラーを選ぶ必要があるモード（提案／希望受領／どちらでもOK）のときだけ色選択を表示
+  const needsColor = ['propose','received','either'].includes(this.value);
+  document.getElementById('propose-field').classList.toggle('hidden', !needsColor);
 });
 
 // ===== 文章生成 =====
@@ -550,10 +554,14 @@ function buildOk(){
     blocks.push(info);
   }
 
-  // カラー提案
+  // カラーの伝え方
+  const pc = document.getElementById('propose_color').value;
   if(colorMode === 'propose'){
-    const pc = document.getElementById('propose_color').value;
     blocks.push('提供させていただくカラーについては' + pc + 'でよろしいでしょうか？（ピュアホワイトとパステルブルーがございます）');
+  }else if(colorMode === 'received'){
+    blocks.push('カラーは、ご希望いただきました' + pc + 'にてご用意させていただきますね！');
+  }else if(colorMode === 'either'){
+    blocks.push('カラーはどちらでも、とのことでしたので、' + pc + 'にてご用意させていただきますね！');
   }
 
   blocks.push('製品の詳細な情報につきましては、後ほどまたお送りいたします。');
