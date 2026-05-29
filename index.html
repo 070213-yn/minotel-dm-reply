@@ -7,149 +7,183 @@
 <title>minotel DM返信文 作成ツール</title>
 <style>
   :root{
-    --bg:#0f1115; --panel:#181b22; --panel2:#1f232c; --line:#2a2f3a;
-    --text:#e8ebf0; --sub:#9aa3b2; --accent:#6aa8ff; --accent2:#3b82f6;
-    --ok:#34d399; --warn:#fbbf24; --danger:#f87171;
+    --bg:#eaf4fd; --bg2:#f7fbff;
+    --panel:#ffffff; --panel2:#f1f7fe;
+    --line:#dcebfa; --line2:#cfe3f7;
+    --text:#3b4b5e; --sub:#90a6bd;
+    --blue:#8ec7f2; --blue-strong:#5aa6e6; --blue-soft:#cfe6fb;
+    --ok:#7fd6ad; --warn:#f6cd77; --danger:#f3a6ad;
+    --shadow:0 6px 20px rgba(120,170,220,.18);
+    --shadow-sm:0 3px 10px rgba(120,170,220,.14);
+    --radius:20px; --radius-sm:14px;
   }
   *{box-sizing:border-box;}
   body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;
-    line-height:1.7; font-size:15px;
+    margin:0; color:var(--text);
+    background:
+      radial-gradient(900px 500px at 12% -8%, #ffffff 0%, rgba(255,255,255,0) 60%),
+      radial-gradient(900px 600px at 100% 0%, #dcecff 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg,#eaf4fd 0%, #f3f9ff 100%);
+    background-attachment:fixed;
+    font-family:"Hiragino Maru Gothic ProN","Quicksand","Segoe UI","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;
+    line-height:1.8; font-size:15px;
   }
 
   /* ===== パスワードロック ===== */
   #lock{
-    position:fixed; inset:0; z-index:9999; background:var(--bg);
+    position:fixed; inset:0; z-index:9999;
+    background:linear-gradient(180deg,#e3f1fd,#f5fbff);
     display:flex; align-items:center; justify-content:center; padding:24px;
   }
   #lock .box{
-    background:var(--panel); border:1px solid var(--line); border-radius:16px;
-    padding:32px 28px; width:100%; max-width:340px; text-align:center;
+    background:var(--panel); border:2px solid var(--blue-soft); border-radius:28px;
+    padding:36px 30px; width:100%; max-width:340px; text-align:center;
+    box-shadow:var(--shadow);
   }
-  #lock h2{margin:0 0 4px; font-size:18px;}
+  #lock .cloud{font-size:40px; line-height:1; margin-bottom:6px;}
+  #lock h2{margin:0 0 4px; font-size:18px; color:var(--blue-strong);}
   #lock p{margin:0 0 20px; color:var(--sub); font-size:13px;}
   #lock input{
     width:100%; text-align:center; font-size:22px; letter-spacing:8px;
-    background:var(--panel2); border:1px solid var(--line); color:var(--text);
-    border-radius:10px; padding:12px; margin-bottom:14px;
+    background:var(--panel2); border:2px solid var(--line2); color:var(--text);
+    border-radius:16px; padding:12px; margin-bottom:14px;
   }
-  #lock input:focus{outline:none; border-color:var(--accent2);}
+  #lock input:focus{outline:none; border-color:var(--blue);}
   #lock button{
-    width:100%; background:var(--accent2); color:#fff; border:none;
-    border-radius:10px; padding:12px; font-size:15px; font-weight:700; cursor:pointer;
+    width:100%; background:linear-gradient(180deg,#9bcdf5,#7bb8ee); color:#fff; border:none;
+    border-radius:16px; padding:13px; font-size:15px; font-weight:700; cursor:pointer;
+    box-shadow:var(--shadow-sm);
   }
-  #lock .err{color:var(--danger); font-size:13px; height:18px; margin-top:10px;}
+  #lock button:hover{filter:brightness(1.04);}
+  #lock .err{color:#e0848c; font-size:13px; height:18px; margin-top:10px;}
 
   header{
-    padding:18px 20px; border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg,#1a1e27,#14171e);
+    padding:22px 22px 18px; text-align:center;
+    background:linear-gradient(180deg,#ffffff,#f0f7ff);
+    border-bottom:2px solid var(--blue-soft);
+    border-radius:0 0 28px 28px;
+    box-shadow:var(--shadow-sm);
   }
-  header h1{margin:0; font-size:17px; font-weight:700;}
-  header p{margin:4px 0 0; color:var(--sub); font-size:13px;}
-  header details{margin-top:10px;}
-  header summary{cursor:pointer; color:var(--accent); font-size:13px; user-select:none;}
+  header h1{
+    margin:0; font-size:19px; font-weight:800; color:var(--blue-strong);
+    letter-spacing:.3px;
+  }
+  header h1 .cloud{font-size:22px;}
+  header p{margin:6px 0 0; color:var(--sub); font-size:13px;}
+  header details{margin:12px auto 0; max-width:620px; text-align:left;}
+  header summary{
+    cursor:pointer; color:var(--blue-strong); font-size:13px; font-weight:700;
+    user-select:none; list-style:none; display:inline-block;
+    background:var(--panel2); border:1.5px solid var(--blue-soft);
+    padding:6px 14px; border-radius:999px;
+  }
+  header summary::-webkit-details-marker{display:none;}
   header details .note{
-    margin-top:10px; font-size:12.5px; color:var(--sub);
-    background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:12px 14px;
+    margin-top:10px; font-size:12.5px; color:var(--text);
+    background:#ffffff; border:1.5px solid var(--blue-soft); border-radius:var(--radius-sm); padding:14px 16px;
+    box-shadow:var(--shadow-sm);
   }
   header details .note ul{margin:6px 0 0; padding-left:18px;}
-  header details .note li{margin-bottom:4px;}
+  header details .note li{margin-bottom:6px;}
 
   .wrap{
-    display:grid; grid-template-columns:1fr 1fr; gap:0;
-    min-height:calc(100vh - 68px);
+    display:grid; grid-template-columns:1fr 1fr; gap:20px;
+    max-width:1100px; margin:0 auto; padding:22px;
   }
-  .col{padding:20px; overflow:auto;}
-  .col.left{border-right:1px solid var(--line);}
+  .col{min-width:0;}
 
   .section{
-    background:var(--panel); border:1px solid var(--line);
-    border-radius:12px; padding:16px; margin-bottom:16px;
+    background:var(--panel); border:1.5px solid var(--blue-soft);
+    border-radius:var(--radius); padding:18px; margin-bottom:18px;
+    box-shadow:var(--shadow-sm);
   }
   .section h2{
-    margin:0 0 14px; font-size:14px; font-weight:700; color:var(--accent);
-    display:flex; align-items:center; gap:8px;
+    margin:0 0 16px; font-size:14.5px; font-weight:800; color:var(--blue-strong);
+    display:flex; align-items:center; gap:9px;
   }
   .section h2 .num{
-    background:var(--accent2); color:#fff; border-radius:50%;
-    width:22px; height:22px; display:inline-flex; align-items:center;
-    justify-content:center; font-size:12px; flex:none;
+    background:linear-gradient(180deg,#9bcdf5,#7bb8ee); color:#fff; border-radius:50%;
+    width:24px; height:24px; display:inline-flex; align-items:center;
+    justify-content:center; font-size:12px; flex:none; box-shadow:var(--shadow-sm);
   }
-  label{display:block; font-size:13px; color:var(--sub); margin:0 0 6px;}
+  label{display:block; font-size:13px; color:var(--sub); margin:0 0 6px; font-weight:600;}
   input[type=text], select, textarea{
-    width:100%; background:var(--panel2); border:1px solid var(--line);
-    color:var(--text); border-radius:8px; padding:10px 12px; font-size:16px;
+    width:100%; background:var(--panel2); border:1.5px solid var(--line2);
+    color:var(--text); border-radius:var(--radius-sm); padding:11px 14px; font-size:16px;
     font-family:inherit;
   }
   input[type=text]:focus, select:focus, textarea:focus{
-    outline:none; border-color:var(--accent2);
+    outline:none; border-color:var(--blue); background:#fff;
+    box-shadow:0 0 0 3px rgba(142,199,242,.25);
   }
+  ::placeholder{color:#b7c7d8;}
   .field{margin-bottom:14px;}
   .field:last-child{margin-bottom:0;}
   .row{display:flex; gap:10px;}
   .row > *{flex:1;}
 
-  .patterns{display:flex; gap:8px; flex-wrap:wrap;}
+  .patterns{display:flex; gap:10px; flex-wrap:wrap;}
   .pat{
-    flex:1; min-width:80px; cursor:pointer; text-align:center; padding:12px 6px;
-    background:var(--panel2); border:2px solid var(--line); border-radius:10px;
-    font-size:13px; font-weight:600; transition:.15s; user-select:none;
+    flex:1; min-width:84px; cursor:pointer; text-align:center; padding:14px 6px;
+    background:var(--panel2); border:2px solid var(--line2); border-radius:18px;
+    font-size:12.5px; font-weight:700; transition:.18s; user-select:none; line-height:1.4;
   }
-  .pat .em{display:block; font-size:18px; margin-bottom:4px;}
-  .pat:hover{border-color:var(--accent2);}
-  .pat.active[data-p=ok]{border-color:var(--ok); background:rgba(52,211,153,.12); color:var(--ok);}
-  .pat.active[data-p=ship]{border-color:var(--accent); background:rgba(106,168,255,.14); color:var(--accent);}
-  .pat.active[data-p=hold]{border-color:var(--warn); background:rgba(251,191,36,.12); color:var(--warn);}
-  .pat.active[data-p=ng]{border-color:var(--danger); background:rgba(248,113,113,.12); color:var(--danger);}
+  .pat .em{display:block; font-size:22px; margin-bottom:5px;}
+  .pat:hover{border-color:var(--blue); transform:translateY(-2px); box-shadow:var(--shadow-sm);}
+  .pat.active{transform:translateY(-2px); box-shadow:var(--shadow-sm);}
+  .pat.active[data-p=ok]{border-color:var(--ok); background:rgba(127,214,173,.16); color:#3fae82;}
+  .pat.active[data-p=ship]{border-color:var(--blue); background:rgba(142,199,242,.20); color:var(--blue-strong);}
+  .pat.active[data-p=hold]{border-color:var(--warn); background:rgba(246,205,119,.20); color:#d4a23a;}
+  .pat.active[data-p=ng]{border-color:var(--danger); background:rgba(243,166,173,.18); color:#dd8088;}
 
-  .checks{display:flex; flex-direction:column; gap:8px;}
+  .checks{display:flex; flex-direction:column; gap:9px;}
   .chk{
-    display:flex; align-items:flex-start; gap:10px; cursor:pointer;
-    background:var(--panel2); border:1px solid var(--line); border-radius:8px;
-    padding:10px 12px; transition:.15s;
+    display:flex; align-items:flex-start; gap:11px; cursor:pointer;
+    background:var(--panel2); border:1.5px solid var(--line2); border-radius:var(--radius-sm);
+    padding:11px 14px; transition:.15s;
   }
-  .chk:hover{border-color:var(--accent2);}
-  .chk input{margin-top:3px; width:18px; height:18px; flex:none; accent-color:var(--accent2);}
-  .chk .t{font-size:14px; color:var(--text);}
-  .chk .d{font-size:12px; color:var(--sub); margin-top:2px;}
+  .chk:hover{border-color:var(--blue); background:#fff;}
+  .chk input{margin-top:3px; width:18px; height:18px; flex:none; accent-color:var(--blue-strong);}
+  .chk .t{font-size:14px; color:var(--text); font-weight:600;}
+  .chk .d{font-size:12px; color:var(--sub); margin-top:2px; font-weight:400;}
 
   .group-label{
-    font-size:12px; color:var(--accent); font-weight:700; margin:14px 0 8px;
-    border-top:1px solid var(--line); padding-top:14px;
+    font-size:12.5px; color:var(--blue-strong); font-weight:800; margin:16px 0 9px;
+    border-top:1.5px dashed var(--blue-soft); padding-top:15px;
+    display:flex; align-items:center; gap:6px;
   }
   .hidden{display:none !important;}
   .hint{font-size:12px; color:var(--sub); margin-top:6px;}
   .subfield{margin-left:24px; margin-top:8px;}
 
   .timing-box{
-    margin-top:10px; padding:14px; border-radius:8px;
-    background:rgba(106,168,255,.06); border:1px dashed var(--accent);
+    margin-top:10px; padding:14px; border-radius:var(--radius-sm);
+    background:rgba(142,199,242,.10); border:1.5px dashed var(--blue);
   }
 
-  .out-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:8px;}
+  .out-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;}
   .out-head h2{margin:0;}
   #output{
-    width:100%; min-height:420px; resize:vertical; line-height:1.8;
-    font-size:15px; background:#0b0d11;
+    width:100%; min-height:430px; resize:vertical; line-height:1.9;
+    font-size:15px; background:#fbfdff; border-color:var(--blue-soft);
   }
   .btn{
-    cursor:pointer; border:none; border-radius:8px; padding:10px 18px;
-    font-size:14px; font-weight:700; font-family:inherit; transition:.15s;
+    cursor:pointer; border:none; border-radius:999px; padding:11px 22px;
+    font-size:14px; font-weight:800; font-family:inherit; transition:.15s;
   }
-  .btn-primary{background:var(--accent2); color:#fff;}
-  .btn-primary:hover{background:#2f6fd6;}
-  .copied{color:var(--ok); font-size:13px; margin-left:10px; opacity:0; transition:.2s;}
+  .btn-primary{background:linear-gradient(180deg,#9bcdf5,#7bb8ee); color:#fff; box-shadow:var(--shadow-sm);}
+  .btn-primary:hover{filter:brightness(1.05); transform:translateY(-1px);}
+  .copied{color:#3fae82; font-size:13px; margin-left:10px; opacity:0; transition:.2s; font-weight:700;}
   .copied.show{opacity:1;}
   .footer-note{font-size:12px; color:var(--sub); margin-top:14px;}
 
   /* ===== スマホ対応 ===== */
   @media (max-width:820px){
-    .wrap{grid-template-columns:1fr;}
-    .col.left{border-right:none; border-bottom:1px solid var(--line);}
+    .wrap{grid-template-columns:1fr; gap:0; padding:16px;}
     #output{min-height:300px;}
     /* スマホでは出力を一番上に固定して見やすく */
-    .col.right{order:-1; position:sticky; top:0; z-index:50; background:var(--bg);}
+    .col.right{order:-1; position:sticky; top:0; z-index:50; padding-top:8px;
+      background:linear-gradient(180deg,#f3f9ff 80%, rgba(243,249,255,0));}
   }
 </style>
 </head>
@@ -158,17 +192,18 @@
 <!-- パスワードロック -->
 <div id="lock">
   <div class="box">
+    <div class="cloud">☁️</div>
     <h2>minotel 返信ツール</h2>
     <p>パスワードを入力してください</p>
     <input type="password" id="pw" inputmode="numeric" autocomplete="off" placeholder="••••">
-    <button id="pwBtn">開く</button>
+    <button id="pwBtn">ひらく</button>
     <div class="err" id="pwErr"></div>
   </div>
 </div>
 
 <header>
-  <h1>minotel cloud speaker — DM返信文 作成ツール</h1>
-  <p>提供応募のDMに返信する文章を、項目を選ぶだけで自動で組み立てます。</p>
+  <h1><span class="cloud">☁️</span> minotel cloud speaker — DM返信文 作成ツール</h1>
+  <p>提供応募のDMに返信する文章を、項目を選ぶだけでふんわり組み立てます。</p>
   <details>
     <summary>確認メモ（提供確定の相手にだけ）</summary>
     <div class="note">
@@ -188,10 +223,10 @@
     <div class="section">
       <h2><span class="num">1</span>返信パターン</h2>
       <div class="patterns" id="patterns">
-        <div class="pat active" data-p="ok"><span class="em">○</span>提供OK<br>（初回）</div>
-        <div class="pat" data-p="ship"><span class="em">☁</span>発送連絡<br>（情報受領後）</div>
-        <div class="pat" data-p="hold"><span class="em">…</span>保留<br>（検討中）</div>
-        <div class="pat" data-p="ng"><span class="em">×</span>お断り</div>
+        <div class="pat active" data-p="ok"><span class="em">🩵</span>提供OK<br>（初回）</div>
+        <div class="pat" data-p="ship"><span class="em">☁️</span>発送連絡<br>（情報受領後）</div>
+        <div class="pat" data-p="hold"><span class="em">⏳</span>保留<br>（検討中）</div>
+        <div class="pat" data-p="ng"><span class="em">🌧️</span>お断り</div>
       </div>
     </div>
 
@@ -227,7 +262,7 @@
         </label>
       </div>
 
-      <div class="group-label">デスク写真について</div>
+      <div class="group-label">🖼️ デスク写真について</div>
       <div class="checks">
         <label class="chk">
           <input type="checkbox" id="c_photo">
@@ -240,7 +275,7 @@
         <div class="hint">空欄なら「{{LEDカラー}}」のまま残るので、後で手直しできます。</div>
       </div>
 
-      <div class="group-label">提供カラーの伝え方</div>
+      <div class="group-label">🎨 提供カラーの伝え方</div>
       <div class="field">
         <select id="color_mode">
           <option value="propose">こちらから提案する（「〇〇でよろしいですか？」）</option>
@@ -256,7 +291,7 @@
         </select>
       </div>
 
-      <div class="group-label">PRのお願い（条件）　※チェックすると「条件ありパターン」になります</div>
+      <div class="group-label">📸 PRのお願い（条件）　※チェックすると「条件ありパターン」になります</div>
       <div class="checks">
         <label class="chk">
           <input type="checkbox" id="c_beforeafter">
@@ -268,7 +303,7 @@
         </label>
       </div>
 
-      <div class="group-label">投稿・タグ付けのお願い</div>
+      <div class="group-label">📣 投稿・タグ付けのお願い</div>
       <div class="checks">
         <label class="chk">
           <input type="checkbox" id="c_post">
@@ -281,7 +316,7 @@
       </div>
 
       <div style="margin-top:14px;">
-        <label class="chk" style="border-color:var(--accent);">
+        <label class="chk" style="border-color:var(--blue);">
           <input type="checkbox" id="c_timing">
           <span><span class="t">投稿時期をお願いする（特定の人向け）</span><span class="d">「できれば〇月上旬頃に」と希望時期を添える。強制ではない言い方になります</span></span>
         </label>
@@ -305,7 +340,7 @@
         </div>
       </div>
 
-      <div class="group-label">発送先情報の依頼</div>
+      <div class="group-label">📮 発送先情報の依頼</div>
       <div class="checks">
         <label class="chk">
           <input type="checkbox" id="c_info" checked>
@@ -353,10 +388,10 @@
   <div class="col right">
     <div class="section" style="margin-bottom:0;">
       <div class="out-head">
-        <h2><span class="num">✓</span>返信文プレビュー</h2>
+        <h2><span class="num">♡</span>返信文プレビュー</h2>
         <div>
           <button class="btn btn-primary" id="copyBtn">コピー</button>
-          <span class="copied" id="copied">コピーしました</span>
+          <span class="copied" id="copied">コピーしました ☁️</span>
         </div>
       </div>
       <textarea id="output" spellcheck="false"></textarea>
