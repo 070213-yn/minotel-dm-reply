@@ -557,7 +557,8 @@ const TPL_DEFS = [
   {g:'提供OK', k:'ok_accept',      l:'受諾（初回）', v:'まずは弊ブランドの製品をご紹介いただけるとのこと、ありがとうございます！ぜひお願いできればと思います！'},
   {g:'提供OK', k:'ok_accept2',     l:'受諾（2通目）', v:'それでは、ぜひ製品をご提供させていただければと思います✨'},
   {g:'提供OK', k:'ok_trouble',     l:'画像をURL・リプで送ってくれた相手へのお礼／おわび', v:'お写真も拝見させていただきました、ありがとうございます✨\nお手数をおかけして申し訳ございませんでした！'},
-  {g:'提供OK', k:'ok_photo',       l:'デスク写真コメント（{led}）', v:'大変素敵なデスク写真もありがとうございます✨\n雲スピーカーのLEDは{led}にも設定できますので、とても相性が良いと思います…！☁️'},
+  {g:'提供OK', k:'ok_photo_thanks', l:'デスク写真へのお礼', v:'大変素敵なデスク写真もありがとうございます✨'},
+  {g:'提供OK', k:'ok_photo_led',    l:'LED相性コメント（{led}）', v:'雲スピーカーのLEDは{led}にも設定できますので、とても相性が良いと思います…！☁️'},
   {g:'提供OK', k:'ask_review',     l:'レビューの方向性', v:'本製品は音質よりもインテリア性を重視した製品のため、ご紹介の際は主に外観や操作性について言及いただけますと幸いです。\n音質に触れる場合は、極力マイナスな言葉は避けていただけますと幸いです。（× 低音が弱い・良くない → 〇 低音は控えめ など）'},
   {g:'提供OK', k:'ask_beforeafter',l:'ビフォアフター単体', v:'スピーカーを置く前と置いた後で雰囲気がどのくらい変わるかが分かりやすいよう、ビフォーアフターが分かる動画や写真を入れていただけますと嬉しいです。'},
   {g:'提供OK', k:'ask_post',       l:'SNS投稿・タグ付け（{sns}）', v:'商品が届きましたら、{sns}にてデスク環境と一緒にご紹介いただけますと幸いです。\nご紹介の際は「@minotel_office」のメンションと、ハッシュタグ「#minotel」「#PR」の2つを必ずご記載いただけますようお願いいたします。'},
@@ -708,14 +709,16 @@ function buildOk(){
 
   blocks.push(greeted ? tpl('ok_accept2') : tpl('ok_accept'));
 
-  // 画像をURL・リプで送ってくれた相手へのお礼／おわび
-  if(document.getElementById('c_trouble').checked){
+  // 写真まわり（URL/リプのお礼おわびと、デスク写真コメントの「ありがとう」重複を避けてまとめる）
+  const trouble = document.getElementById('c_trouble').checked;
+  const photo = document.getElementById('c_photo').checked;
+  const led = (document.getElementById('led').value||'').trim() || '{{LEDカラー}}';
+  if(trouble && photo){
+    blocks.push(tpl('ok_trouble') + '\n' + tpl('ok_photo_led', {led: led}));
+  }else if(trouble){
     blocks.push(tpl('ok_trouble'));
-  }
-
-  if(document.getElementById('c_photo').checked){
-    const led = (document.getElementById('led').value||'').trim() || '{{LEDカラー}}';
-    blocks.push(tpl('ok_photo', {led: led}));
+  }else if(photo){
+    blocks.push(tpl('ok_photo_thanks') + '\n' + tpl('ok_photo_led', {led: led}));
   }
 
   // カラーの伝え方
