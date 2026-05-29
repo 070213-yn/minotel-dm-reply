@@ -346,6 +346,14 @@
         </div>
       </div>
 
+      <div class="group-label">🎁 特典のご提案</div>
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="c_promo">
+          <span><span class="t">専用プロモーションコードを提案する</span><span class="d">相手のフォロワー向けに、Amazonで10〜15%OFFになる専用コードを用意する提案</span></span>
+        </label>
+      </div>
+
       <div class="group-label">📮 発送先情報の依頼</div>
       <div class="checks">
         <label class="chk">
@@ -551,6 +559,13 @@ function buildOk(){
   // 投稿時期
   if(document.getElementById('c_timing').checked){
     blocks.push(buildTiming());
+  }
+
+  // 専用プロモーションコードの提案
+  if(document.getElementById('c_promo').checked){
+    const nm = nameLine();
+    const target = nm ? (nm + 'のフォロワー様') : 'フォロワー様';
+    blocks.push('また、' + target + 'に向けた、専用プロモーションコードをご用意させていただけないでしょうか？\n（Amazonにて10〜15%OFFになるプロモーションコードの予定です。）');
   }
 
   // 発送先情報の依頼
