@@ -314,7 +314,7 @@
           <span><span class="t">ビフォアフターのお願い</span><span class="d">スピーカーを置く前後が分かる写真・動画を入れてもらう</span></span>
         </label>
       </div>
-      <div class="hint">「公式Instagramでの紹介」をオンにするとビフォアフター撮影の依頼も含まれるため、その場合はビフォアフター単体は自動で省略されます。</div>
+      <div class="hint">「公式SNS（X・Instagram）での紹介を打診する」をオンにするとビフォアフター撮影の依頼も含まれるため、その場合はビフォアフター単体は自動で省略されます。</div>
 
       <div class="group-label">📣 投稿・タグ付けのお願い</div>
       <div class="checks">
@@ -324,7 +324,7 @@
         </label>
         <label class="chk">
           <input type="checkbox" id="c_feature">
-          <span><span class="t">公式Instagramでの紹介をお願いする</span><span class="d">クレジット付きで公式IGに掲載＋ビフォアフター撮影（写真OK）を依頼</span></span>
+          <span><span class="t">公式SNS（X・Instagram）での紹介を打診する</span><span class="d">クレジット付きで公式SNS掲載の可能性を確認＋ビフォアフター撮影（写真OK）を依頼</span></span>
         </label>
       </div>
       <div class="subfield hidden" id="sns-field">
@@ -637,7 +637,7 @@ function buildOk(){
     asks.push('商品が届きましたら、' + sns + 'にてデスク環境と一緒にご紹介いただけますと幸いです。\nご紹介の際は「@minotel_office」のメンションと、ハッシュタグ「#minotel」「#PR」の2つを必ずご記載いただけますようお願いいたします。');
   }
   if(feature){
-    asks.push('今回ご提供させていただくスピーカーを使ったセットアップを、公式Instagramでもクレジット付きでご紹介させていただけないでしょうか？\nもし可能でしたら、スピーカーを置く前と置いた後のビフォーアフターをそれぞれ撮影いただけますと幸いです（基本的には写真でOKです）。\nスピーカーに合わせてセットアップを変えていただくのも全く問題ございません。');
+    asks.push('今回ご提供させていただくスピーカーを使ったセットアップを、公式SNS（XやInstagram）にてクレジット付きでご紹介させていただく可能性がございますが、問題ございませんでしょうか？\nもし可能でしたら、スピーカーを置く前と置いた後のビフォーアフターをそれぞれ撮影いただけますと幸いです（基本的には写真でOKです）。\nスピーカーに合わせてセットアップを変えていただくのも全く問題ございません。');
   }
   if(timing){
     asks.push(buildTimingCore());
