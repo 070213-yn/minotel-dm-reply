@@ -223,6 +223,7 @@
     <div class="section">
       <h2><span class="num">1</span>返信パターン</h2>
       <div class="patterns" id="patterns">
+        <div class="pat" data-p="media"><span class="em">💬</span>媒体確認<br>（打診）</div>
         <div class="pat active" data-p="ok"><span class="em">🩵</span>提供OK<br>（初回）</div>
         <div class="pat" data-p="ship"><span class="em">☁️</span>発送連絡<br>（情報受領後）</div>
         <div class="pat" data-p="hold"><span class="em">⏳</span>保留<br>（検討中）</div>
@@ -248,6 +249,18 @@
       <div class="field">
         <label>運営者名（署名）</label>
         <input type="text" id="owner" value="近藤">
+      </div>
+    </div>
+
+    <!-- 媒体確認（打診）オプション -->
+    <div class="section mediaonly hidden" id="media-options">
+      <h2><span class="num">3</span>媒体確認（打診）の内容</h2>
+      <div class="hint" style="margin:0 0 12px;">提供確定の前に、相手がどの媒体で紹介できるかを軽く聞く文面です。</div>
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="m_apology">
+          <span><span class="t">「返信が遅くなり申し訳ございません」を入れる</span><span class="d">返信までに少し時間が空いた相手向け</span></span>
+        </label>
       </div>
     </div>
 
@@ -463,6 +476,7 @@ document.getElementById('patterns').addEventListener('click', e=>{
 });
 
 function updateVisibility(){
+  document.getElementById('media-options').classList.toggle('hidden', currentPattern !== 'media');
   document.querySelectorAll('.okonly').forEach(el=>el.classList.toggle('hidden', currentPattern !== 'ok'));
   document.getElementById('ship-options').classList.toggle('hidden', currentPattern !== 'ship');
   document.getElementById('ng-options').classList.toggle('hidden', currentPattern !== 'ng');
@@ -506,6 +520,26 @@ function buildTiming(){
   const when = (period === '頃') ? (month + '月頃') : (month + '月' + period + '頃');
   return 'また、投稿の時期につきまして、もし可能であれば' + when +
     'にご投稿いただけますと嬉しいです。\n（あくまで「できれば」のお願いですので、ご都合の良いタイミングで問題ございません。）';
+}
+
+// 媒体確認（打診）— 提供確定前のジャブ
+function buildMedia(){
+  const blocks = [];
+  const nl = nameLine();
+  if(nl) blocks.push(nl);
+
+  let greet = '';
+  if(document.getElementById('m_apology').checked){
+    greet += '返信が遅くなりまして申し訳ございません。\n';
+  }
+  greet += 'はじめまして、minotelの運営をしております' + ownerName() + 'と申します。\n';
+  greet += 'この度はご連絡いただき誠にありがとうございます。';
+  blocks.push(greet);
+
+  blocks.push('ご紹介についてですが、普段はどちらの媒体でのご紹介が可能でしょうか？\n（X / Instagram / TikTok / YouTube など）');
+  blocks.push('差し支えなければ教えていただけますと幸いです。\n何卒よろしくお願いいたします！');
+
+  return blocks.join('\n\n');
 }
 
 // ① 提供OK・初回返信
@@ -652,7 +686,8 @@ function buildNg(){
 
 function render(){
   let text = '';
-  if(currentPattern === 'ok') text = buildOk();
+  if(currentPattern === 'media') text = buildMedia();
+  else if(currentPattern === 'ok') text = buildOk();
   else if(currentPattern === 'ship') text = buildShip();
   else if(currentPattern === 'hold') text = buildHold();
   else text = buildNg();
