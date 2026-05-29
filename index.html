@@ -47,6 +47,14 @@
   }
   header h1{margin:0; font-size:17px; font-weight:700;}
   header p{margin:4px 0 0; color:var(--sub); font-size:13px;}
+  header details{margin-top:10px;}
+  header summary{cursor:pointer; color:var(--accent); font-size:13px; user-select:none;}
+  header details .note{
+    margin-top:10px; font-size:12.5px; color:var(--sub);
+    background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:12px 14px;
+  }
+  header details .note ul{margin:6px 0 0; padding-left:18px;}
+  header details .note li{margin-bottom:4px;}
 
   .wrap{
     display:grid; grid-template-columns:1fr 1fr; gap:0;
@@ -82,15 +90,16 @@
   .row{display:flex; gap:10px;}
   .row > *{flex:1;}
 
-  .patterns{display:flex; gap:8px;}
+  .patterns{display:flex; gap:8px; flex-wrap:wrap;}
   .pat{
-    flex:1; cursor:pointer; text-align:center; padding:12px 6px;
+    flex:1; min-width:80px; cursor:pointer; text-align:center; padding:12px 6px;
     background:var(--panel2); border:2px solid var(--line); border-radius:10px;
     font-size:13px; font-weight:600; transition:.15s; user-select:none;
   }
   .pat .em{display:block; font-size:18px; margin-bottom:4px;}
   .pat:hover{border-color:var(--accent2);}
   .pat.active[data-p=ok]{border-color:var(--ok); background:rgba(52,211,153,.12); color:var(--ok);}
+  .pat.active[data-p=ship]{border-color:var(--accent); background:rgba(106,168,255,.14); color:var(--accent);}
   .pat.active[data-p=hold]{border-color:var(--warn); background:rgba(251,191,36,.12); color:var(--warn);}
   .pat.active[data-p=ng]{border-color:var(--danger); background:rgba(248,113,113,.12); color:var(--danger);}
 
@@ -111,6 +120,7 @@
   }
   .hidden{display:none !important;}
   .hint{font-size:12px; color:var(--sub); margin-top:6px;}
+  .subfield{margin-left:24px; margin-top:8px;}
 
   .timing-box{
     margin-top:10px; padding:14px; border-radius:8px;
@@ -159,6 +169,16 @@
 <header>
   <h1>minotel cloud speaker — DM返信文 作成ツール</h1>
   <p>提供応募のDMに返信する文章を、項目を選ぶだけで自動で組み立てます。</p>
+  <details>
+    <summary>確認メモ（提供確定の相手にだけ）</summary>
+    <div class="note">
+      <ul>
+        <li><b>他社製品の映り込み</b>：相手のデスク写真に他社モニターやフィギュア等が映っている場合、minotelの商用素材（Amazon等）への転用は権利リスクあり。商用転用は避けるか事前確認を取る。</li>
+        <li><b>公式Xでの紹介</b>：相手の投稿を @minotel_office で紹介する場合は事前許可を取り、「撮影：〇〇様」とクレジット。</li>
+        <li><b>法人所属の相手</b>：他社と専属/競合契約がある場合あり。写真の二次利用を依頼するときは「他社様との契約上問題ないかご確認いただけますか」と一言添える。</li>
+      </ul>
+    </div>
+  </details>
 </header>
 
 <div class="wrap">
@@ -168,8 +188,9 @@
     <div class="section">
       <h2><span class="num">1</span>返信パターン</h2>
       <div class="patterns" id="patterns">
-        <div class="pat active" data-p="ok"><span class="em">○</span>提供OK</div>
-        <div class="pat" data-p="hold"><span class="em">…</span>保留・検討中</div>
+        <div class="pat active" data-p="ok"><span class="em">○</span>提供OK<br>（初回）</div>
+        <div class="pat" data-p="ship"><span class="em">☁</span>発送連絡<br>（情報受領後）</div>
+        <div class="pat" data-p="hold"><span class="em">…</span>保留<br>（検討中）</div>
         <div class="pat" data-p="ng"><span class="em">×</span>お断り</div>
       </div>
     </div>
@@ -195,9 +216,9 @@
       </div>
     </div>
 
-    <!-- 承諾オプション -->
+    <!-- 承諾・初回オプション -->
     <div class="section okonly" id="ok-options">
-      <h2><span class="num">3</span>承諾返信の内容</h2>
+      <h2><span class="num">3</span>承諾・初回返信の内容</h2>
 
       <div class="checks">
         <label class="chk">
@@ -206,7 +227,36 @@
         </label>
       </div>
 
-      <div class="group-label">安全のためのお願い（条件）　※チェックすると「条件ありパターン」になります</div>
+      <div class="group-label">デスク写真について</div>
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="c_photo">
+          <span><span class="t">デスク写真へのコメントを入れる</span><span class="d">写真を添付してくれた相手向け。LED色の相性に触れます（写真がない相手はオフ）</span></span>
+        </label>
+      </div>
+      <div class="subfield hidden" id="led-field">
+        <label>相手のデスクに合うLEDカラー（任意）</label>
+        <input type="text" id="led" placeholder="例：紫 / ピンク / 青 など">
+        <div class="hint">空欄なら「{{LEDカラー}}」のまま残るので、後で手直しできます。</div>
+      </div>
+
+      <div class="group-label">提供カラーの伝え方</div>
+      <div class="field">
+        <select id="color_mode">
+          <option value="propose">こちらから提案する（「〇〇でよろしいですか？」）</option>
+          <option value="ask">希望を聞く（情報依頼に「⑤希望カラー」を追加）</option>
+          <option value="none">カラーには触れない</option>
+        </select>
+      </div>
+      <div class="subfield" id="propose-field">
+        <label>提案するカラー</label>
+        <select id="propose_color">
+          <option value="ピュアホワイト">ピュアホワイト</option>
+          <option value="パステルブルー">パステルブルー</option>
+        </select>
+      </div>
+
+      <div class="group-label">PRのお願い（条件）　※チェックすると「条件ありパターン」になります</div>
       <div class="checks">
         <label class="chk">
           <input type="checkbox" id="c_beforeafter">
@@ -218,29 +268,18 @@
         </label>
       </div>
 
-      <div class="group-label">伝える項目</div>
+      <div class="group-label">投稿・タグ付けのお願い</div>
       <div class="checks">
         <label class="chk">
           <input type="checkbox" id="c_post">
           <span><span class="t">SNS投稿・タグ付けのお願い</span><span class="d">紹介投稿で「@minotel_office」メンション＋「#minotel」「#PR」必須を依頼</span></span>
         </label>
-        <label class="chk">
-          <input type="checkbox" id="c_info" checked>
-          <span><span class="t">発送先の返信依頼（①〜）</span><span class="d">郵便番号・住所・電話・氏名をお願いする</span></span>
-        </label>
-        <label class="chk" id="color-row" style="margin-left:24px;">
-          <input type="checkbox" id="c_color" checked>
-          <span><span class="t">希望カラーも一緒に聞く</span><span class="d">事前にカラーを聞いている場合はオフにすると⑤が消えます</span></span>
-        </label>
       </div>
-
-      <!-- 投稿のお願いがONのときだけSNS欄を出す -->
-      <div class="field hidden" id="sns-field" style="margin-top:14px;">
+      <div class="subfield hidden" id="sns-field">
         <label>紹介してもらうSNS（任意）</label>
         <input type="text" id="sns" placeholder="例：X / TikTok / Instagram（空欄ならSNSと表記）">
       </div>
 
-      <!-- 投稿時期 -->
       <div style="margin-top:14px;">
         <label class="chk" style="border-color:var(--accent);">
           <input type="checkbox" id="c_timing">
@@ -265,6 +304,34 @@
           <div class="hint">あくまで「できれば」のお願いとして文章に入ります。</div>
         </div>
       </div>
+
+      <div class="group-label">発送先情報の依頼</div>
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="c_info" checked>
+          <span><span class="t">発送先情報の返信依頼</span><span class="d">郵便番号・住所・電話・氏名をお願いする（配送時のみ使用と明記）</span></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 発送連絡オプション -->
+    <div class="section shiponly hidden" id="ship-options">
+      <h2><span class="num">3</span>発送連絡の内容</h2>
+      <div class="field">
+        <label>紹介用素材のGoogleドライブリンク</label>
+        <input type="text" id="drive" value="https://drive.google.com/drive/folders/1Dr0dTOSKV9o2U6p6ZsOowakbLfaWAT_j">
+        <div class="hint">空欄なら「{{Googleドライブ素材リンク}}」のまま残ります。</div>
+      </div>
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="c_prpoint">
+          <span><span class="t">PRポイントを伝える</span><span class="d">相手から「PRしてほしい点はある？」と聞かれた場合に添える</span></span>
+        </label>
+      </div>
+      <div class="subfield hidden" id="prpoint-field">
+        <label>PRしてほしい点</label>
+        <input type="text" id="prpoint" placeholder="例：デスクに馴染むデザインと、雲のような優しい光">
+      </div>
     </div>
 
     <!-- お断りオプション -->
@@ -273,8 +340,8 @@
       <div class="field">
         <label>添える理由</label>
         <select id="ng_reason">
-          <option value="general">特に理由は明記しない（無難）</option>
-          <option value="full">現在ご応募多数のため</option>
+          <option value="full">現在ご応募多数のため（無難・おすすめ）</option>
+          <option value="general">特に理由は明記しない</option>
           <option value="direction">方向性・テイストが合わないため</option>
         </select>
       </div>
@@ -347,23 +414,26 @@ document.getElementById('patterns').addEventListener('click', e=>{
 });
 
 function updateVisibility(){
-  const isOk = currentPattern === 'ok';
-  const isNg = currentPattern === 'ng';
-  document.querySelectorAll('.okonly').forEach(el=>el.classList.toggle('hidden', !isOk));
-  document.getElementById('ng-options').classList.toggle('hidden', !isNg);
+  document.querySelectorAll('.okonly').forEach(el=>el.classList.toggle('hidden', currentPattern !== 'ok'));
+  document.getElementById('ship-options').classList.toggle('hidden', currentPattern !== 'ship');
+  document.getElementById('ng-options').classList.toggle('hidden', currentPattern !== 'ng');
 }
 
-// 時期ボックス開閉
+// 各サブ項目の開閉
 document.getElementById('c_timing').addEventListener('change', function(){
   document.getElementById('timing-box').classList.toggle('hidden', !this.checked);
 });
-// SNS欄の開閉
 document.getElementById('c_post').addEventListener('change', function(){
   document.getElementById('sns-field').classList.toggle('hidden', !this.checked);
 });
-// 希望カラー行の開閉（発送先依頼がオフなら隠す）
-document.getElementById('c_info').addEventListener('change', function(){
-  document.getElementById('color-row').classList.toggle('hidden', !this.checked);
+document.getElementById('c_photo').addEventListener('change', function(){
+  document.getElementById('led-field').classList.toggle('hidden', !this.checked);
+});
+document.getElementById('c_prpoint').addEventListener('change', function(){
+  document.getElementById('prpoint-field').classList.toggle('hidden', !this.checked);
+});
+document.getElementById('color_mode').addEventListener('change', function(){
+  document.getElementById('propose-field').classList.toggle('hidden', this.value !== 'propose');
 });
 
 // ===== 文章生成 =====
@@ -387,104 +457,136 @@ function buildTiming(){
     'にご投稿いただけますと嬉しいです。\n（あくまで「できれば」のお願いですので、ご都合の良いタイミングで問題ございません。）';
 }
 
-function buildInfo(){
-  let t = 'もしPRいただける場合は以下をご返信いただけますと幸いです。\n' +
-    '①郵便番号\n②配送先住所\n③電話番号\n④氏名';
-  if(document.getElementById('c_color').checked){
-    t += '\n⑤希望カラー（ピュアホワイトとパステルブルーがございます）';
-  }
-  return t;
-}
-
+// ① 提供OK・初回返信
 function buildOk(){
+  const blocks = [];
   const nl = nameLine();
-  const apology = document.getElementById('c_apology').checked;
+  if(nl) blocks.push(nl);
+
+  // 挨拶
+  let greet = '';
+  if(document.getElementById('c_apology').checked){
+    greet += '返信が遅くなりまして申し訳ございません。\n';
+  }
+  greet += 'はじめまして、minotelの運営をしております' + ownerName() + 'と申します。\n';
+  greet += 'この度はご連絡いただき誠にありがとうございます。';
+  blocks.push(greet);
+
+  blocks.push('まずは弊ブランドの製品をご紹介いただけるとのこと、ありがとうございます！ぜひお願い出来ればと思います！');
+
+  // デスク写真コメント
+  if(document.getElementById('c_photo').checked){
+    const led = (document.getElementById('led').value||'').trim() || '{{LEDカラー}}';
+    blocks.push('また、大変素敵なデスク写真もありがとうございます✨\n雲スピーカーのLEDは' + led + 'にも設定できますので、とても相性が良いと思います…！☁️');
+  }
+
+  // PR条件
   const ba = document.getElementById('c_beforeafter').checked;
   const rv = document.getElementById('c_review').checked;
-  const post = document.getElementById('c_post').checked;
-  const info = document.getElementById('c_info').checked;
-  const timing = document.getElementById('c_timing').checked;
-  const sns = (document.getElementById('sns').value||'').trim() || 'SNS';
-  const hasCond = ba || rv;
-
-  let t = '';
-  if(nl) t += nl + '\n\n';
-  t += 'お世話になっております。\n';
-  if(apology) t += '返信が遅くなりまして申し訳ございません。\n';
-  t += 'minotelの運営をしております、' + ownerName() + 'と申します。\n\n';
-  t += 'この度は製品提供についてのご連絡ありがとうございます！\n';
-
-  if(hasCond){
-    t += '以下の点について問題ないようでしたら、お願いできればと思います！\n';
+  if(ba || rv){
+    let c = '差し支えなければ、以下の点についてもご協力いただけますと幸いです。';
     if(ba){
-      t += '\n・デスクの雰囲気がスピーカーだけでどのくらい変わるかが分かりやすいよう、スピーカーを置く前と置いた後のビフォアフターが分かる動画や写真を入れる\n';
+      c += '\n\n・デスクの雰囲気がスピーカーだけでどのくらい変わるかが分かりやすいよう、スピーカーを置く前と置いた後のビフォアフターが分かる動画や写真を入れていただく';
     }
     if(rv){
-      t += '\n・本製品は音質よりもインテリア性を重視した製品のため、主に外観や操作性について言及いただきたいです。\n';
-      t += '　音質に関するレビューをする場合は極力マイナスな言葉は避けてください。（×　低音が弱い、良くない→〇　低音は控え目　など）\n';
+      c += '\n\n・本製品は音質よりもインテリア性を重視した製品のため、主に外観や操作性について言及いただけますと嬉しいです。\n　音質に触れる場合は、極力マイナスな言葉は避けていただけますと幸いです。（× 低音が弱い・良くない → 〇 低音は控えめ など）';
     }
-  }else{
-    t += 'ぜひお願いできればと思います！\n';
+    blocks.push(c);
   }
 
-  if(post){
-    t += '\n商品が届きましたら、' + sns + 'にてデスク環境と一緒にご紹介いただけますと幸いです。\n';
-    t += 'ご紹介の際は「@minotel_office」のメンションと、ハッシュタグ「#minotel」「#PR」の2つを必ずご記載いただけますようお願いいたします。\n';
+  // SNS投稿・タグ付け
+  if(document.getElementById('c_post').checked){
+    const sns = (document.getElementById('sns').value||'').trim() || 'SNS';
+    blocks.push('商品が届きましたら、' + sns + 'にてデスク環境と一緒にご紹介いただけますと幸いです。\nご紹介の際は「@minotel_office」のメンションと、ハッシュタグ「#minotel」「#PR」の2つを必ずご記載いただけますようお願いいたします。');
   }
 
-  if(timing){
-    t += '\n' + buildTiming() + '\n';
+  // 投稿時期
+  if(document.getElementById('c_timing').checked){
+    blocks.push(buildTiming());
   }
 
-  if(info){
-    t += '\n' + buildInfo() + '\n';
+  // 発送先情報の依頼
+  const colorMode = document.getElementById('color_mode').value;
+  if(document.getElementById('c_info').checked){
+    let info = 'ご提供にあたり、以下のご情報をご返信いただけますでしょうか？\n（頂戴したご情報は配送時のみに使用いたします）\n\n①郵便番号\n②配送先住所\n③電話番号\n④氏名';
+    if(colorMode === 'ask'){
+      info += '\n⑤希望カラー（ピュアホワイトとパステルブルーがございます）';
+    }
+    blocks.push(info);
   }
 
-  t += '\n以上、ご確認のほどよろしくお願い致します！';
-  return t;
+  // カラー提案
+  if(colorMode === 'propose'){
+    const pc = document.getElementById('propose_color').value;
+    blocks.push('提供させていただくカラーについては' + pc + 'でよろしいでしょうか？（ピュアホワイトとパステルブルーがございます）');
+  }
+
+  blocks.push('製品の詳細な情報につきましては、後ほどまたお送りいたします。');
+  blocks.push('以上、ご確認のほどよろしくお願いいたします！');
+
+  return blocks.join('\n\n');
 }
 
+// ② 情報受領後・発送連絡
+function buildShip(){
+  const blocks = [];
+  const nl = nameLine();
+  if(nl) blocks.push(nl);
+
+  blocks.push('ご情報ありがとうございます✨');
+  blocks.push('近日中に発送の手配をさせていただきます！');
+
+  if(document.getElementById('c_prpoint').checked){
+    const p = (document.getElementById('prpoint').value||'').trim() || '{{PRして欲しい点}}';
+    blocks.push('PRのポイントとしましては、' + p + 'を挙げていただけると嬉しいです！');
+  }
+
+  const link = (document.getElementById('drive').value||'').trim() || '{{Googleドライブ素材リンク}}';
+  blocks.push('また、ご紹介の際にご自由にお使いいただける素材を以下のGoogleドライブにご用意しておりますので、必要に応じてご活用ください☁️\n\n' + link);
+
+  blocks.push('引き続きよろしくお願いいたします🙇‍♂️');
+
+  return blocks.join('\n\n');
+}
+
+// 保留・検討中
 function buildHold(){
+  const blocks = [];
   const nl = nameLine();
-  let t = '';
-  if(nl) t += nl + '\n\n';
-  t += 'お世話になっております。\n';
-  t += 'minotelの運営をしております、' + ownerName() + 'と申します。\n\n';
-  t += 'この度は製品提供についてのご連絡ありがとうございます！\n\n';
-  t += 'ありがたいことに多くのご連絡をいただいており、現在こちらで検討を進めております。\n';
-  t += '少々お時間をいただきますが、改めてご連絡させていただきますので、今しばらくお待ちいただけますと幸いです。\n\n';
-  t += '何卒よろしくお願い致します！';
-  return t;
+  if(nl) blocks.push(nl);
+  blocks.push('はじめまして、minotelの運営をしております' + ownerName() + 'と申します。\nこの度はご連絡いただき誠にありがとうございます。');
+  blocks.push('ありがたいことに多くのご連絡をいただいており、現在こちらで検討を進めております。\n少々お時間をいただきますが、改めてご連絡させていただきますので、今しばらくお待ちいただけますと幸いです。');
+  blocks.push('何卒よろしくお願い致します！');
+  return blocks.join('\n\n');
 }
 
+// ③ お見送り
 function buildNg(){
+  const blocks = [];
   const nl = nameLine();
-  const reason = document.getElementById('ng_reason').value;
-  let t = '';
-  if(nl) t += nl + '\n\n';
-  t += 'お世話になっております。\n';
-  t += 'minotelの運営をしております、' + ownerName() + 'と申します。\n\n';
-  t += 'この度は製品提供についてのご相談、また丁寧にご連絡をいただきありがとうございます。\n\n';
+  if(nl) blocks.push(nl);
 
+  blocks.push('はじめまして、minotelの運営をしております' + ownerName() + 'と申します。\nこの度は弊ブランドの製品にご興味をお寄せいただき、また温かいメッセージをいただき誠にありがとうございます。');
+
+  const reason = document.getElementById('ng_reason').value;
   if(reason === 'full'){
-    t += 'ありがたいことに現在多くのご応募をいただいておりまして、慎重に検討させていただいた結果、\n';
-    t += '今回はご提供を見送らせていただくこととなりました。\n';
+    blocks.push('大変ありがたいことに、今回は予想を超える多くの方からご連絡を頂戴いたしました。\n慎重に検討させていただいた結果、誠に勝手ながら今回のご提供は見送らせていただくこととなりました。');
   }else if(reason === 'direction'){
-    t += '検討させていただきましたが、今回は弊社がイメージする方向性との兼ね合いもあり、\n';
-    t += '誠に勝手ながらご提供を見送らせていただくこととなりました。\n';
+    blocks.push('慎重に検討させていただきましたが、今回は弊ブランドがイメージする方向性との兼ね合いもあり、\n誠に勝手ながら今回のご提供は見送らせていただくこととなりました。');
   }else{
-    t += '慎重に検討させていただきましたが、誠に勝手ながら、\n';
-    t += '今回はご提供を見送らせていただくこととなりました。\n';
+    blocks.push('慎重に検討させていただいた結果、誠に勝手ながら今回のご提供は見送らせていただくこととなりました。');
   }
 
-  t += '\nせっかくお声がけいただいたにもかかわらず、ご期待に沿えず申し訳ございません。\n';
-  t += '今後ともminotelをどうぞよろしくお願い致します。';
-  return t;
+  blocks.push('せっかくご連絡いただいたにも関わらず、ご期待に沿えず申し訳ございません。\n今後また別の機会がございましたら、ぜひご一緒できれば幸いです。');
+  blocks.push('この度は本当にありがとうございました。');
+
+  return blocks.join('\n\n');
 }
 
 function render(){
   let text = '';
   if(currentPattern === 'ok') text = buildOk();
+  else if(currentPattern === 'ship') text = buildShip();
   else if(currentPattern === 'hold') text = buildHold();
   else text = buildNg();
   document.getElementById('output').value = text;
