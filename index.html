@@ -179,6 +179,11 @@
   .btn-soft{background:var(--panel2); color:var(--blue-strong); border:1.5px solid var(--blue-soft);}
   .copied{color:#3fae82; font-size:13px; margin-left:10px; opacity:0; transition:.2s; font-weight:700;}
   .copied.show{opacity:1;}
+  /* プレビューを隠した状態（ヘッダーだけの細いバーに） */
+  #preview-section.preview-collapsed{padding-bottom:14px;}
+  #preview-section.preview-collapsed .out-head{margin-bottom:0;}
+  #preview-section.preview-collapsed #output,
+  #preview-section.preview-collapsed .footer-note{display:none;}
   .footer-note{font-size:12px; color:var(--sub); margin-top:14px;}
 
   /* ===== テンプレート編集モーダル ===== */
@@ -480,10 +485,11 @@
 
   <!-- 右：出力 -->
   <div class="col right">
-    <div class="section" style="margin-bottom:0;">
+    <div class="section" id="preview-section" style="margin-bottom:0;">
       <div class="out-head">
         <h2><span class="num">♡</span>返信文プレビュー</h2>
         <div>
+          <button class="btn btn-soft" id="togglePreview" style="padding:9px 14px;">隠す</button>
           <button class="btn btn-primary" id="copyBtn">コピー</button>
           <span class="copied" id="copied">コピーしました ☁️</span>
         </div>
@@ -977,6 +983,24 @@ document.getElementById('tplResetAll').addEventListener('click', function(){
   buildTplEditor();
   render();
 });
+
+// ===== プレビューの表示／非表示（縮小）トグル =====
+(function(){
+  const sec = document.getElementById('preview-section');
+  const btn = document.getElementById('togglePreview');
+  function apply(collapsed){
+    sec.classList.toggle('preview-collapsed', collapsed);
+    btn.textContent = collapsed ? '表示' : '隠す';
+  }
+  let init = false;
+  try{ init = localStorage.getItem('minotel_preview_collapsed') === '1'; }catch(e){}
+  apply(init);
+  btn.addEventListener('click', function(){
+    const collapsed = !sec.classList.contains('preview-collapsed');
+    apply(collapsed);
+    try{ localStorage.setItem('minotel_preview_collapsed', collapsed ? '1' : '0'); }catch(e){}
+  });
+})();
 
 updateVisibility();
 render();
