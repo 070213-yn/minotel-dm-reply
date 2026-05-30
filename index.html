@@ -510,6 +510,7 @@
     <div id="tplList"></div>
     <div class="modal-foot">
       <button id="tplResetAll" class="btn btn-soft">すべて初期文に戻す</button>
+      <button id="tplExport" class="btn btn-soft">📋 編集した文面をコピー（共有用）</button>
       <button id="tplSave" class="btn btn-primary">保存する</button>
     </div>
   </div>
@@ -944,6 +945,24 @@ document.getElementById('tplSave').addEventListener('click', function(){
   loadTpl();
   render();
   closeTpl();
+});
+document.getElementById('tplExport').addEventListener('click', function(){
+  // 初期文と違う（＝編集した）文面だけを書き出す
+  const obj = {};
+  document.querySelectorAll('#tplList textarea').forEach(ta=>{
+    if(ta.value !== TPL_DEFAULT[ta.dataset.k]) obj[ta.dataset.k] = ta.value;
+  });
+  const keys = Object.keys(obj);
+  if(keys.length === 0){
+    alert('編集した文面はまだありません（すべて初期文のままです）。');
+    return;
+  }
+  const txt = '===minotel文面設定===\n' + JSON.stringify(obj, null, 2);
+  navigator.clipboard.writeText(txt).then(()=>{
+    alert(keys.length + '件の編集文面をコピーしました。\nチャットに貼り付けて送ってください。');
+  }).catch(()=>{
+    window.prompt('以下をすべてコピーして送ってください', txt);
+  });
 });
 document.getElementById('tplResetAll').addEventListener('click', function(){
   if(!confirm('編集した文面をすべて初期状態に戻します。よろしいですか？')) return;
