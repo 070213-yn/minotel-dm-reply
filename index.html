@@ -305,6 +305,14 @@
           <input type="checkbox" id="m_reply_img">
           <span><span class="t">リプで画像を送ってくれたパターン</span><span class="d">DMで画像が送れず、リプライで写真を送ってくれた相手向け（拝見しました＋お手数のおわび）</span></span>
         </label>
+        <label class="chk">
+          <input type="checkbox" id="m_askmedia" checked>
+          <span><span class="t">紹介できる媒体を聞く</span><span class="d">「どの媒体でご紹介いただけますか？」を入れる。オフにすると質問を外せます（写真依頼だけ等）</span></span>
+        </label>
+        <label class="chk">
+          <input type="checkbox" id="m_askphoto">
+          <span><span class="t">デスク写真の送付をお願いする</span><span class="d">「DM承認したら送ります」等の相手に。まだ提供確定前の段階で「お手数ですが、デスク写真を送っていただけますでしょうか？」を入れます</span></span>
+        </label>
       </div>
     </div>
 
@@ -562,8 +570,9 @@ const TPL_DEFS = [
   {g:'媒体確認（打診）', k:'media_photo',       l:'デスク写真へのお礼', v:'また、素敵なデスク写真もありがとうございます！'},
   {g:'媒体確認（打診）', k:'media_reply_photo', l:'リプ画像のとき写真お礼の前置き', v:'素敵なデスク写真もありがとうございます！'},
   {g:'媒体確認（打診）', k:'media_reply',       l:'リプで画像を送ってくれた対応', v:'DMでは画像をお送りいただけなかったとのことで、リプライにてお送りいただいたお写真も拝見させていただきました！\nお手数をおかけして申し訳ございませんでした。'},
-  {g:'媒体確認（打診）', k:'media_q',           l:'媒体を聞く本文', v:'ご紹介についてですが、ご提供させていただいた場合は、どの媒体でご紹介いただけますでしょうか？\n（X / Instagram / TikTok / YouTube など）'},
-  {g:'媒体確認（打診）', k:'media_close',       l:'締め', v:'差し支えなければ教えていただけますと幸いです。\n何卒よろしくお願いいたします！'},
+  {g:'媒体確認（打診）', k:'media_q',           l:'媒体を聞く本文', v:'ご紹介についてですが、ご提供させていただいた場合は、どの媒体でご紹介いただけますでしょうか？\n（X / Instagram / TikTok / YouTube など）\n差し支えなければ教えていただけますと幸いです。'},
+  {g:'媒体確認（打診）', k:'media_askphoto',    l:'デスク写真の送付をお願いする', v:'また、お手数ですが、デスク写真を送っていただけますでしょうか？'},
+  {g:'媒体確認（打診）', k:'media_close',       l:'締め', v:'何卒よろしくお願いいたします！'},
 
   {g:'提供OK', k:'ok_greeted',     l:'2通目の冒頭', v:'ご返信ありがとうございます！'},
   {g:'提供OK', k:'ok_accept',      l:'受諾（初回）', v:'また、弊ブランドの製品をご紹介いただけるとのこと、ありがとうございます！ぜひお願いできればと思います！'},
@@ -702,7 +711,8 @@ function buildMedia(){
     blocks.push(tpl('media_photo'));
   }
 
-  blocks.push(tpl('media_q'));
+  if(document.getElementById('m_askmedia').checked) blocks.push(tpl('media_q'));
+  if(document.getElementById('m_askphoto').checked) blocks.push(tpl('media_askphoto'));
   blocks.push(tpl('media_close'));
   return blocks.join('\n\n');
 }
@@ -894,10 +904,11 @@ document.getElementById('manual').addEventListener('input', function(){
 // ===== 入力クリア（応募者ごとの項目だけ。運営者名・素材リンク・マニュアルは保持）=====
 document.getElementById('resetBtn').addEventListener('click', function(){
   ['name','led','sns','prpoint'].forEach(id=>{ document.getElementById(id).value=''; });
-  ['c_greeted','c_apology','c_trouble','m_apology','m_photo','m_reply_img','c_photo','c_beforeafter','c_review',
+  ['c_greeted','c_apology','c_trouble','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_beforeafter','c_review',
    'c_post','c_feature','c_timing','c_promo','c_prpoint','c_repost']
     .forEach(id=>{ document.getElementById(id).checked=false; });
   document.getElementById('c_info').checked = true;
+  document.getElementById('m_askmedia').checked = true;
   document.getElementById('color_mode').value = 'propose';
   document.getElementById('led-field').classList.add('hidden');
   document.getElementById('sns-field').classList.add('hidden');
