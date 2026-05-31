@@ -740,15 +740,14 @@ function buildOk(){
   else if(colorMode === 'received') blocks.push(tpl('color_received', {pc: pc}));
   else if(colorMode === 'either') blocks.push(tpl('color_either', {pc: pc}));
 
-  // 発送先情報の依頼
+  // 発送先情報の依頼（見出し付きで相手が読みやすいように）
   if(document.getElementById('c_info').checked){
     let info = tpl('info_request');
     if(colorMode === 'ask') info += '\n' + tpl('info_color5');
-    blocks.push(info);
+    blocks.push('【配送先情報】\n' + info);
   }
 
-  // ご紹介・お願い事（カラー→発送先情報のあとにまとめる）。組み合わせに応じた接続詞でつなぐ
-  const asks = [];
+  // ご紹介・ご依頼（見出し＋●の箇条書きで、相手がパッと読める形に）
   const feature = document.getElementById('c_feature').checked;
   const ba = document.getElementById('c_beforeafter').checked;
   const rv = document.getElementById('c_review').checked;
@@ -756,22 +755,23 @@ function buildOk(){
   const timing = document.getElementById('c_timing').checked;
   const promo = document.getElementById('c_promo').checked;
 
+  const askItems = [];
   if(post){
     const sns = (document.getElementById('sns').value||'').trim() || 'SNS';
-    asks.push(tpl('ask_post', {sns: sns}));
+    askItems.push(['SNSでのご紹介・タグ付け', tpl('ask_post', {sns: sns})]);
   }
-  if(feature) asks.push(tpl('ask_feature'));
-  if(rv) asks.push(tpl('ask_review'));
-  if(ba && !feature) asks.push(tpl('ask_beforeafter')); // 公式SNS紹介に含まれる場合は重複回避
-  if(timing) asks.push(tpl('ask_timing', {when: timingWhen()}));
+  if(feature) askItems.push(['公式SNSでのご紹介', tpl('ask_feature')]);
+  if(rv) askItems.push(['ご紹介内容について', tpl('ask_review')]);
+  if(ba && !feature) askItems.push(['ビフォーアフターの撮影', tpl('ask_beforeafter')]); // 公式SNS紹介に含まれる場合は重複回避
+  if(timing) askItems.push(['投稿時期について', tpl('ask_timing', {when: timingWhen()})]);
   if(promo){
     const target = nl ? (nl + 'のフォロワー様') : 'フォロワー様';
-    asks.push(tpl('ask_promo', {target: target}));
+    askItems.push(['専用プロモーションコード', tpl('ask_promo', {target: target})]);
   }
-
-  // 1つ目は接続詞なし。2つ目以降に「また、」などを付与
-  const conj = ['', 'また、', 'あわせて、', 'さらに、', '加えて、', 'そのうえで、'];
-  asks.forEach(function(t, i){ blocks.push((i < conj.length ? conj[i] : 'また、') + t); });
+  if(askItems.length){
+    const body = askItems.map(function(it){ return '●' + it[0] + '\n' + it[1]; }).join('\n\n');
+    blocks.push('【ご紹介・ご依頼について】\n' + body);
+  }
 
   // 製品マニュアル案内
   const manual = (document.getElementById('manual').value||'').trim() || '{{製品マニュアルのURL}}';
