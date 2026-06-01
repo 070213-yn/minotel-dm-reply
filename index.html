@@ -258,7 +258,7 @@
       <div class="patterns" id="patterns">
         <div class="pat" data-p="media"><span class="em">💬</span>媒体確認<br>（打診）</div>
         <div class="pat active" data-p="ok"><span class="em">🩵</span>提供OK<br>（初回）</div>
-        <div class="pat" data-p="ship"><span class="em">☁️</span>発送連絡<br>（情報受領後）</div>
+        <div class="pat" data-p="ship"><span class="em">☁️</span>発送完了<br>（連絡）</div>
         <div class="pat" data-p="thanks"><span class="em">💕</span>お礼<br>（投稿後）</div>
         <div class="pat" data-p="hold"><span class="em">⏳</span>保留<br>（検討中）</div>
         <div class="pat" data-p="ng"><span class="em">🌧️</span>お断り</div>
@@ -446,7 +446,7 @@
 
     <!-- 発送連絡オプション -->
     <div class="section shiponly hidden" id="ship-options">
-      <h2><span class="num">3</span>発送連絡の内容</h2>
+      <h2><span class="num">3</span>発送完了連絡の内容</h2>
       <div class="field">
         <label>紹介用素材のGoogleドライブリンク</label>
         <input type="text" id="drive" value="https://drive.google.com/drive/folders/1Dr0dTOSKV9o2U6p6ZsOowakbLfaWAT_j">
@@ -595,7 +595,7 @@ const TPL_DEFS = [
   {g:'提供OK', k:'ok_close',       l:'締め', v:'以上、ご確認のほどよろしくお願いいたします！'},
 
   {g:'発送連絡', k:'ship_thanks',   l:'冒頭', v:'ご情報ありがとうございます✨'},
-  {g:'発送連絡', k:'ship_send',     l:'発送のお知らせ', v:'近日中に発送の手配をさせていただきます！'},
+  {g:'発送連絡', k:'ship_send',     l:'発送完了のお知らせ', v:'本日、商品の発送が完了いたしました！\nお届けまで今しばらくお待ちくださいませ。'},
   {g:'発送連絡', k:'ship_prpoint',  l:'PRポイント（{prpoint}）', v:'PRのポイントとしましては、{prpoint}を挙げていただけると嬉しいです！'},
   {g:'発送連絡', k:'ship_material', l:'素材リンク案内（{link}）', v:'また、ご紹介の際にご自由にお使いいただける素材を以下のGoogleドライブにご用意しておりますので、必要に応じてご活用ください☁️\nhttps://drive.google.com/drive/folders/1Dr0dTOSKV9o2U6p6ZsOowakbLfaWAT_j'},
   {g:'発送連絡', k:'ship_close',    l:'締め', v:'引き続きよろしくお願いいたします🙇‍♂️'},
