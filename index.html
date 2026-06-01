@@ -348,6 +348,14 @@
         <div class="hint">空欄なら「{{LEDカラー}}」のまま残るので、後で手直しできます。</div>
       </div>
 
+      <div class="group-label">📦 製品についてのご確認</div>
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="c_sample">
+          <span><span class="t">サンプル品（小傷など）の確認を入れる</span><span class="d">展示用などのサンプル提供で、わずかな傷・汚れがある場合がある旨を、角が立たないやわらかい言い方で確認</span></span>
+        </label>
+      </div>
+
       <div class="group-label">📸 ご紹介内容のお願い</div>
       <div class="checks">
         <label class="chk">
@@ -580,6 +588,7 @@ const TPL_DEFS = [
   {g:'提供OK', k:'ok_trouble',     l:'画像をURL・リプで送ってくれた相手へのお礼／おわび', v:'お写真も拝見させていただきました、ありがとうございます✨\nお手数をおかけして申し訳ございませんでした！'},
   {g:'提供OK', k:'ok_photo_thanks', l:'デスク写真へのお礼', v:'大変素敵なデスク写真もありがとうございます✨'},
   {g:'提供OK', k:'ok_photo_led',    l:'LED相性コメント（{led}）', v:'雲スピーカーのLEDは{led}にも設定できますので、とても相性が良いと思います…！☁️'},
+  {g:'提供OK', k:'ok_sample',       l:'サンプル品（小傷など）のご確認', v:'なお、今回ご提供させていただく製品はサンプル品となっており、展示用に使用したものが含まれる場合がございます。\nそのため、ごくわずかに小傷や汚れが見られることがございますが、その点ご了承いただけますでしょうか？'},
   {g:'提供OK', k:'ask_review',     l:'レビューの方向性', v:'本製品は音質よりもインテリア性を重視した製品のため、ご紹介の際は主に外観や操作性について言及いただけますと幸いです。\n音質に触れる場合は、極力マイナスな言葉は避けていただけますと幸いです。（× 低音が弱い・良くない → 〇 低音は控えめ など）'},
   {g:'提供OK', k:'ask_beforeafter',l:'ビフォアフター単体', v:'スピーカーを置く前と置いた後で雰囲気がどのくらい変わるかが分かりやすいよう、ビフォーアフターが分かる動画や写真を入れていただけますと嬉しいです。'},
   {g:'提供OK', k:'ask_post',       l:'SNS投稿・タグ付け（{sns}）', v:'商品が届きましたら、{sns}にてデスク環境と一緒にご紹介いただけますと幸いです。\nご紹介の際は「@minotel_office」のメンションと、ハッシュタグ「#minotel」「#PR」の2つを必ずご記載いただけますようお願いいたします。'},
@@ -752,6 +761,11 @@ function buildOk(){
     blocks.push(tpl('ok_photo_thanks') + '\n' + tpl('ok_photo_led', {led: led}));
   }
 
+  // 製品（サンプル品）についてのご確認
+  if(document.getElementById('c_sample').checked){
+    blocks.push(tpl('ok_sample'));
+  }
+
   // カラーの伝え方
   const colorMode = document.getElementById('color_mode').value;
   const pc = document.getElementById('propose_color').value;
@@ -914,7 +928,7 @@ document.getElementById('manual').addEventListener('input', function(){
 document.getElementById('resetBtn').addEventListener('click', function(){
   ['name','led','sns','prpoint'].forEach(id=>{ document.getElementById(id).value=''; });
   // 既定でオフにする項目
-  ['c_greeted','c_trouble','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_beforeafter','c_review',
+  ['c_greeted','c_trouble','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_sample','c_beforeafter','c_review',
    'c_timing','c_prpoint','c_repost']
     .forEach(id=>{ document.getElementById(id).checked=false; });
   // 既定でオンにする項目（提供OKのよく使う設定）
