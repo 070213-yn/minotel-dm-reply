@@ -552,7 +552,41 @@
 <script>
 // ===== パスワードロック =====
 const PASSWORD = "1224";
-function unlock(){ document.getElementById('lock').style.display = 'none'; }
+function unlock(){
+  document.getElementById('lock').style.display = 'none';
+  // 影響範囲: 提供先管理ツールから ?name=...&color=... を渡されたら自動入力
+  try{ applyUrlParams(); }catch(e){ console.error(e); }
+}
+// 提供先管理ツールからのURLパラメータを反映
+function applyUrlParams(){
+  const p = new URLSearchParams(location.search);
+  const name = p.get('name');
+  const color = p.get('color');
+  const pattern = p.get('pattern');
+  if(name){
+    const el = document.getElementById('name');
+    if(el) el.value = name;
+  }
+  if(color){
+    const cm = document.getElementById('color_mode');
+    const pc = document.getElementById('propose_color');
+    if(cm && pc){
+      if(color === 'ピュアホワイト' || color === 'パステルブルー'){
+        cm.value = 'received'; pc.value = color;
+      } else if(color === 'どちらでもOK'){
+        cm.value = 'either'; pc.value = 'ピュアホワイト';
+      } else {
+        cm.value = 'ask';
+      }
+    }
+  }
+  if(pattern){
+    const pat = document.querySelector('.pat[data-p="'+pattern+'"]');
+    if(pat) pat.click();
+  }
+  if(typeof syncFields === 'function') syncFields();
+  if(typeof render === 'function') render();
+}
 if(sessionStorage.getItem('minotel_unlocked') === '1'){ unlock(); }
 function tryUnlock(){
   const v = document.getElementById('pw').value;
