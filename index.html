@@ -257,6 +257,7 @@
       <h2><span class="num">1</span>返信パターン</h2>
       <div class="patterns" id="patterns">
         <div class="pat" data-p="media"><span class="em">💬</span>媒体確認<br>（打診）</div>
+        <div class="pat" data-p="ref"><span class="em">🤝</span>紹介経由<br>（確認）</div>
         <div class="pat active" data-p="ok"><span class="em">🩵</span>提供OK<br>（初回）</div>
         <div class="pat" data-p="ship"><span class="em">☁️</span>発送完了<br>（連絡）</div>
         <div class="pat" data-p="thanks"><span class="em">💕</span>お礼<br>（投稿後）</div>
@@ -312,6 +313,23 @@
         <label class="chk">
           <input type="checkbox" id="m_askphoto">
           <span><span class="t">デスク写真の送付をお願いする</span><span class="d">「DM承認したら送ります」等の相手に。まだ提供確定前の段階で「お手数ですが、デスク写真を送っていただけますでしょうか？」を入れます</span></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 紹介経由（確認）オプション -->
+    <div class="section refonly hidden" id="ref-options">
+      <h2><span class="num">3</span>紹介経由の確認の内容</h2>
+      <div class="hint" style="margin:0 0 12px;">他の方（紹介元）からの紹介で応募してきた相手に、本人確認をする打診メッセージです。</div>
+      <div class="field">
+        <label>紹介元のお名前</label>
+        <input type="text" id="referrer" value="Pixio池水様">
+        <div class="hint">「〇〇よりご紹介いただきまして」の〇〇に入ります。一度入れれば次回も保持されます。</div>
+      </div>
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="r_apology">
+          <span><span class="t">「返信が遅くなり申し訳ございません」を入れる</span><span class="d">返信までに少し時間が空いた相手向け</span></span>
         </label>
       </div>
     </div>
@@ -621,6 +639,10 @@ const TPL_DEFS = [
   {g:'媒体確認（打診）', k:'media_askphoto',    l:'デスク写真の送付をお願いする', v:'また、お手数ですが、デスク写真を送っていただけますでしょうか？'},
   {g:'媒体確認（打診）', k:'media_close',       l:'締め', v:'何卒よろしくお願いいたします！'},
 
+  {g:'紹介経由（確認）', k:'ref_greet', l:'名乗り（{owner}）', v:'はじめまして、ゲーミングアクセサリブランドminotelを運営しております、{owner}と申します。'},
+  {g:'紹介経由（確認）', k:'ref_body',  l:'紹介確認の本文（{referrer}）', v:'この度は{referrer}よりご紹介いただきまして、弊ブランドの製品をご紹介いただけるとのことでお話を伺っておりますが、お間違いなかったでしょうか？'},
+  {g:'紹介経由（確認）', k:'ref_close', l:'締め', v:'お忙しいところ恐れ入りますが、ご確認のほどよろしくお願いいたします！'},
+
   {g:'提供OK', k:'ok_greeted',     l:'2通目の冒頭', v:'ご返信ありがとうございます！'},
   {g:'提供OK', k:'ok_accept',      l:'受諾（初回）', v:'また、弊ブランドの製品をご紹介いただけるとのこと、ありがとうございます！ぜひお願いできればと思います！'},
   {g:'提供OK', k:'ok_accept2',     l:'受諾（2通目）', v:'それでは、ぜひ製品をご提供させていただければと思います✨'},
@@ -697,6 +719,7 @@ document.getElementById('patterns').addEventListener('click', e=>{
 
 function updateVisibility(){
   document.getElementById('media-options').classList.toggle('hidden', currentPattern !== 'media');
+  document.getElementById('ref-options').classList.toggle('hidden', currentPattern !== 'ref');
   document.querySelectorAll('.okonly').forEach(el=>el.classList.toggle('hidden', currentPattern !== 'ok'));
   document.getElementById('ship-options').classList.toggle('hidden', currentPattern !== 'ship');
   document.getElementById('thanks-options').classList.toggle('hidden', currentPattern !== 'thanks');
@@ -772,6 +795,23 @@ function buildMedia(){
   if(document.getElementById('m_askmedia').checked) blocks.push(tpl('media_q'));
   if(document.getElementById('m_askphoto').checked) blocks.push(tpl('media_askphoto'));
   blocks.push(tpl('media_close'));
+  return blocks.join('\n\n');
+}
+
+// 紹介経由の確認（紹介元から応募してきた相手の本人確認）
+function buildRef(){
+  const blocks = [];
+  const nl = nameLine();
+  if(nl) blocks.push(nl);
+
+  let greet = '';
+  if(document.getElementById('r_apology').checked) greet += tpl('common_apology') + '\n';
+  greet += tpl('ref_greet', {owner: ownerName()});
+  blocks.push(greet);
+
+  const referrer = (document.getElementById('referrer').value||'').trim() || '{{紹介元}}';
+  blocks.push(tpl('ref_body', {referrer: referrer}));
+  blocks.push(tpl('ref_close'));
   return blocks.join('\n\n');
 }
 
@@ -922,6 +962,7 @@ function buildNg(){
 function render(){
   let text = '';
   if(currentPattern === 'media') text = buildMedia();
+  else if(currentPattern === 'ref') text = buildRef();
   else if(currentPattern === 'ok') text = buildOk();
   else if(currentPattern === 'ship') text = buildShip();
   else if(currentPattern === 'thanks') text = buildThanks();
@@ -957,8 +998,13 @@ document.getElementById('copyBtn').addEventListener('click', function(){
     if(d !== null) document.getElementById('drive').value = d;
     const m = localStorage.getItem('minotel_manual');
     if(m !== null) document.getElementById('manual').value = m;
+    const r = localStorage.getItem('minotel_referrer');
+    if(r !== null) document.getElementById('referrer').value = r;
   }catch(e){}
 })();
+document.getElementById('referrer').addEventListener('input', function(){
+  try{ localStorage.setItem('minotel_referrer', this.value); }catch(e){}
+});
 document.getElementById('owner').addEventListener('input', function(){
   try{ localStorage.setItem('minotel_owner', this.value); }catch(e){}
 });
@@ -973,7 +1019,7 @@ document.getElementById('manual').addEventListener('input', function(){
 document.getElementById('resetBtn').addEventListener('click', function(){
   ['name','led','sns','prpoint'].forEach(id=>{ document.getElementById(id).value=''; });
   // 既定でオフにする項目
-  ['c_greeted','c_trouble','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
+  ['c_greeted','c_trouble','r_apology','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
    'c_timing','c_prpoint','c_repost']
     .forEach(id=>{ document.getElementById(id).checked=false; });
   // 既定でオンにする項目（提供OKのよく使う設定）
