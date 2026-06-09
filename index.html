@@ -286,6 +286,12 @@
         <label>運営者名（署名）</label>
         <input type="text" id="owner" value="近藤">
       </div>
+      <div class="checks" style="margin-bottom:10px;">
+        <label class="chk">
+          <input type="checkbox" id="c_followup">
+          <span><span class="t">追加のご連絡（宛名・挨拶を省略）</span><span class="d">「〇〇様」「はじめまして」等を省いて、追加メッセージとして一部だけ送れます（提供OK・紹介経由・媒体確認・アフィリエイトで有効）</span></span>
+        </label>
+      </div>
       <button class="btn btn-soft" id="resetBtn" style="width:100%; margin-top:4px;">入力をクリア（次の人へ）</button>
       <div class="hint">相手の名前やチェックをリセットします（運営者名・素材リンク・マニュアルURLは残ります）。</div>
     </div>
@@ -354,6 +360,10 @@
         <label class="chk">
           <input type="checkbox" id="r_promo">
           <span><span class="t">専用プロモーションコードの可否を確認</span><span class="d">フォロワー向けのAmazon割引コードを使えるか確認する</span></span>
+        </label>
+        <label class="chk">
+          <input type="checkbox" id="r_aff">
+          <span><span class="t">アフィリエイト（売上20%還元）の提案</span><span class="d">プロモコード経由の売上の一部（20%）を還元する成果報酬の提案</span></span>
         </label>
         <label class="chk">
           <input type="checkbox" id="r_feature">
@@ -673,6 +683,7 @@ const TPL_DEFS = [
   {g:'紹介経由（確認）', k:'ref_color', l:'カラー確認（{pc}）', v:'提供させていただくカラーについては{pc}でよろしいでしょうか？'},
   {g:'紹介経由（確認）', k:'ref_confirm_intro', l:'あわせて確認の前置き', v:'また、以下についても恐れ入りますがご確認をお願いいたします。'},
   {g:'紹介経由（確認）', k:'ref_promo', l:'プロモコードの可否（{target}）', v:'{target}に向けて、Amazonにて数量限定で25%OFFになる専用コードのご用意を考えております。ご紹介の際にご活用いただくことは可能でしょうか？'},
+  {g:'紹介経由（確認）', k:'ref_aff', l:'アフィリエイト（売上20%還元）', v:'プロモーションコード経由での売上の一部（20%）を還元させていただく形でいかがでしょうか？'},
   {g:'紹介経由（確認）', k:'ref_feature', l:'公式紹介＋ビフォーアフターの確認', v:'弊ブランドの公式アカウントでもデスクをご紹介させていただきたいのですが、可能でしょうか？\nもし可能な場合は、スピーカーを置く前と置いた後のビフォーアフターをそれぞれ撮影いただきたいです。\n（PR投稿の際は特に画像の指定はございませんので、ビフォーアフターについてはDMなどでご共有いただければ幸いです。）'},
   {g:'紹介経由（確認）', k:'ref_close', l:'締め', v:'お忙しいところ恐れ入りますが、ご確認のほどよろしくお願いいたします！'},
 
@@ -816,12 +827,13 @@ function timingWhen(){
 function buildMedia(){
   const blocks = [];
   const nl = nameLine();
-  if(nl) blocks.push(nl);
-
-  let greet = '';
-  if(document.getElementById('m_apology').checked) greet += tpl('common_apology') + '\n';
-  greet += tpl('common_hajimemashite', {owner: ownerName()});
-  blocks.push(greet);
+  if(!document.getElementById('c_followup').checked){
+    if(nl) blocks.push(nl);
+    let greet = '';
+    if(document.getElementById('m_apology').checked) greet += tpl('common_apology') + '\n';
+    greet += tpl('common_hajimemashite', {owner: ownerName()});
+    blocks.push(greet);
+  }
 
   const mPhoto = document.getElementById('m_photo').checked;
   const mReply = document.getElementById('m_reply_img').checked;
@@ -844,15 +856,15 @@ function buildMedia(){
 function buildRef(){
   const blocks = [];
   const nl = nameLine();
-  if(nl) blocks.push(nl);
-
-  let greet = '';
-  if(document.getElementById('r_apology').checked) greet += tpl('common_apology') + '\n';
-  greet += tpl('ref_greet', {owner: ownerName()});
-  blocks.push(greet);
-
-  const referrer = (document.getElementById('referrer').value||'').trim() || '{{紹介元}}';
-  blocks.push(tpl('ref_body', {referrer: referrer}));
+  if(!document.getElementById('c_followup').checked){
+    if(nl) blocks.push(nl);
+    let greet = '';
+    if(document.getElementById('r_apology').checked) greet += tpl('common_apology') + '\n';
+    greet += tpl('ref_greet', {owner: ownerName()});
+    blocks.push(greet);
+    const referrer = (document.getElementById('referrer').value||'').trim() || '{{紹介元}}';
+    blocks.push(tpl('ref_body', {referrer: referrer}));
+  }
 
   // カラーの確認（任意）
   if(document.getElementById('r_color').checked){
@@ -864,6 +876,9 @@ function buildRef(){
   if(document.getElementById('r_promo').checked){
     const target = nl ? (nl + 'のフォロワー様') : 'フォロワー様';
     refItems.push(['専用プロモーションコード', tpl('ref_promo', {target: target})]);
+  }
+  if(document.getElementById('r_aff').checked){
+    refItems.push(['アフィリエイト（売上還元）', tpl('ref_aff')]);
   }
   if(document.getElementById('r_feature').checked){
     refItems.push(['公式アカウントでのご紹介', tpl('ref_feature')]);
@@ -881,15 +896,15 @@ function buildRef(){
 function buildOk(){
   const blocks = [];
   const nl = nameLine();
-  if(nl) blocks.push(nl);
-
   const greeted = document.getElementById('c_greeted').checked;
-  let greet = '';
-  if(document.getElementById('c_apology').checked) greet += tpl('common_apology') + '\n';
-  greet += greeted ? tpl('ok_greeted') : tpl('common_hajimemashite', {owner: ownerName()});
-  blocks.push(greet);
-
-  blocks.push(greeted ? tpl('ok_accept2') : tpl('ok_accept'));
+  if(!document.getElementById('c_followup').checked){
+    if(nl) blocks.push(nl);
+    let greet = '';
+    if(document.getElementById('c_apology').checked) greet += tpl('common_apology') + '\n';
+    greet += greeted ? tpl('ok_greeted') : tpl('common_hajimemashite', {owner: ownerName()});
+    blocks.push(greet);
+    blocks.push(greeted ? tpl('ok_accept2') : tpl('ok_accept'));
+  }
 
   // 写真まわり（URL/リプのお礼おわびと、デスク写真コメントの「ありがとう」重複を避けてまとめる）
   const trouble = document.getElementById('c_trouble').checked;
@@ -999,8 +1014,10 @@ function buildThanks(){
 function buildAffiliate(){
   const blocks = [];
   const nl = nameLine();
-  if(nl) blocks.push(nl);
-  blocks.push(tpl('aff_greet', {owner: ownerName()}));
+  if(!document.getElementById('c_followup').checked){
+    if(nl) blocks.push(nl);
+    blocks.push(tpl('aff_greet', {owner: ownerName()}));
+  }
   blocks.push(tpl('aff_body'));
   blocks.push(tpl('aff_close'));
   return blocks.join('\n\n');
@@ -1093,7 +1110,7 @@ document.getElementById('manual').addEventListener('input', function(){
 document.getElementById('resetBtn').addEventListener('click', function(){
   ['name','led','sns','prpoint'].forEach(id=>{ document.getElementById(id).value=''; });
   // 既定でオフにする項目
-  ['c_greeted','c_trouble','r_apology','r_color','r_promo','r_feature','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
+  ['c_followup','c_greeted','c_trouble','r_apology','r_color','r_promo','r_aff','r_feature','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
    'c_timing','c_prpoint','c_repost']
     .forEach(id=>{ document.getElementById(id).checked=false; });
   // 既定でオンにする項目（提供OKのよく使う設定）
