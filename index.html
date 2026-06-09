@@ -261,6 +261,7 @@
         <div class="pat active" data-p="ok"><span class="em">🩵</span>提供OK<br>（初回）</div>
         <div class="pat" data-p="ship"><span class="em">☁️</span>発送完了<br>（連絡）</div>
         <div class="pat" data-p="thanks"><span class="em">💕</span>お礼<br>（投稿後）</div>
+        <div class="pat" data-p="aff"><span class="em">💰</span>アフィリエイト<br>（提案）</div>
         <div class="pat" data-p="hold"><span class="em">⏳</span>保留<br>（検討中）</div>
         <div class="pat" data-p="ng"><span class="em">🌧️</span>お断り</div>
       </div>
@@ -707,6 +708,10 @@ const TPL_DEFS = [
   {g:'お礼（投稿後）', k:'thanks_repost',l:'リポスト許可のお願い', v:'差し支えなければ、こちらの投稿を公式アカウントでもクレジット付きでご紹介させていただけますでしょうか？'},
   {g:'お礼（投稿後）', k:'thanks_close', l:'締め', v:'また機会がございましたら、ぜひご一緒できれば幸いです。\n今後ともminotelをどうぞよろしくお願いいたします！'},
 
+  {g:'アフィリエイト提案', k:'aff_greet', l:'冒頭（{owner}）', v:'お世話になっております、minotelの{owner}です。\nいつも素敵にご紹介いただきありがとうございます✨'},
+  {g:'アフィリエイト提案', k:'aff_body',  l:'提案本文', v:'突然のご提案で恐れ入りますが、よろしければ成果報酬（アフィリエイト）のお取り組みもご一緒できればと考えております。\nご紹介用にお渡しする専用プロモーションコード経由でのご購入に応じて、売上の一部を還元させていただく形です。'},
+  {g:'アフィリエイト提案', k:'aff_close', l:'締め', v:'ご興味をお持ちいただけましたら詳細をご案内いたしますので、お気軽にお知らせください！\n今後ともどうぞよろしくお願いいたします。'},
+
   {g:'保留（検討中）', k:'hold_greet', l:'冒頭（{owner}）', v:'はじめまして、minotelの運営をしております{owner}と申します。\nこの度はご連絡いただき誠にありがとうございます。'},
   {g:'保留（検討中）', k:'hold_body',  l:'本文', v:'ありがたいことに多くのご連絡をいただいており、現在こちらで検討を進めております。\n少々お時間をいただきますが、改めてご連絡させていただきますので、今しばらくお待ちいただけますと幸いです。'},
   {g:'保留（検討中）', k:'hold_close', l:'締め', v:'何卒よろしくお願い致します！'},
@@ -990,6 +995,17 @@ function buildThanks(){
   return blocks.join('\n\n');
 }
 
+// アフィリエイト（成果報酬）の提案
+function buildAffiliate(){
+  const blocks = [];
+  const nl = nameLine();
+  if(nl) blocks.push(nl);
+  blocks.push(tpl('aff_greet', {owner: ownerName()}));
+  blocks.push(tpl('aff_body'));
+  blocks.push(tpl('aff_close'));
+  return blocks.join('\n\n');
+}
+
 // 保留・検討中
 function buildHold(){
   const blocks = [];
@@ -1023,6 +1039,7 @@ function render(){
   else if(currentPattern === 'ok') text = buildOk();
   else if(currentPattern === 'ship') text = buildShip();
   else if(currentPattern === 'thanks') text = buildThanks();
+  else if(currentPattern === 'aff') text = buildAffiliate();
   else if(currentPattern === 'hold') text = buildHold();
   else text = buildNg();
   document.getElementById('output').value = text;
