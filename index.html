@@ -332,6 +332,34 @@
           <span><span class="t">「返信が遅くなり申し訳ございません」を入れる</span><span class="d">返信までに少し時間が空いた相手向け</span></span>
         </label>
       </div>
+
+      <div class="group-label">🎨 カラーの確認（任意）</div>
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="r_color">
+          <span><span class="t">提供カラーの確認を入れる</span><span class="d">「提供させていただくカラーについては〇〇でよろしいでしょうか？」を追加</span></span>
+        </label>
+      </div>
+      <div class="subfield hidden" id="r_color-field">
+        <label>カラー</label>
+        <select id="r_pc">
+          <option value="ピュアホワイト">ピュアホワイト</option>
+          <option value="パステルブルー">パステルブルー</option>
+        </select>
+      </div>
+
+      <div class="group-label">📋 あわせて確認すること（任意）</div>
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="r_promo">
+          <span><span class="t">専用プロモーションコードの可否を確認</span><span class="d">フォロワー向けのAmazon割引コードを使えるか確認する</span></span>
+        </label>
+        <label class="chk">
+          <input type="checkbox" id="r_feature">
+          <span><span class="t">公式でのデスク紹介＋ビフォーアフターの確認</span><span class="d">公式紹介の可否＋ビフォーアフター撮影（DM共有OK）のお願い</span></span>
+        </label>
+      </div>
+      <div class="hint">どちらかをオンにすると「また、以下についても恐れ入りますがご確認をお願いいたします。」＋●の箇条書きが入ります。</div>
     </div>
 
     <!-- 承諾・初回オプション -->
@@ -641,6 +669,10 @@ const TPL_DEFS = [
 
   {g:'紹介経由（確認）', k:'ref_greet', l:'名乗り（{owner}）', v:'はじめまして、ゲーミングアクセサリブランドminotelを運営しております、{owner}と申します。'},
   {g:'紹介経由（確認）', k:'ref_body',  l:'紹介確認の本文（{referrer}）', v:'この度は{referrer}よりご紹介いただきまして、弊ブランドの製品をご紹介いただけるとのことでお話を伺っておりますが、お間違いなかったでしょうか？'},
+  {g:'紹介経由（確認）', k:'ref_color', l:'カラー確認（{pc}）', v:'提供させていただくカラーについては{pc}でよろしいでしょうか？'},
+  {g:'紹介経由（確認）', k:'ref_confirm_intro', l:'あわせて確認の前置き', v:'また、以下についても恐れ入りますがご確認をお願いいたします。'},
+  {g:'紹介経由（確認）', k:'ref_promo', l:'プロモコードの可否（{target}）', v:'{target}に向けて、Amazonにて数量限定で25%OFFになる専用コードのご用意を考えております。ご紹介の際にご活用いただくことは可能でしょうか？'},
+  {g:'紹介経由（確認）', k:'ref_feature', l:'公式紹介＋ビフォーアフターの確認', v:'弊ブランドの公式アカウントでもデスクをご紹介させていただきたいのですが、可能でしょうか？\nもし可能な場合は、スピーカーを置く前と置いた後のビフォーアフターをそれぞれ撮影いただきたいです。\n（PR投稿の際は特に画像の指定はございませんので、ビフォーアフターについてはDMなどでご共有いただければ幸いです。）'},
   {g:'紹介経由（確認）', k:'ref_close', l:'締め', v:'お忙しいところ恐れ入りますが、ご確認のほどよろしくお願いいたします！'},
 
   {g:'提供OK', k:'ok_greeted',     l:'2通目の冒頭', v:'ご返信ありがとうございます！'},
@@ -744,12 +776,17 @@ document.getElementById('color_mode').addEventListener('change', function(){
   document.getElementById('propose-field').classList.toggle('hidden', !needsColor);
 });
 
+document.getElementById('r_color').addEventListener('change', function(){
+  document.getElementById('r_color-field').classList.toggle('hidden', !this.checked);
+});
+
 // チェック状態に合わせて補助欄（SNS欄・LED欄など）の表示を揃える
 function syncFields(){
   document.getElementById('led-field').classList.toggle('hidden', !document.getElementById('c_photo').checked);
   document.getElementById('sns-field').classList.toggle('hidden', !document.getElementById('c_post').checked);
   document.getElementById('timing-box').classList.toggle('hidden', !document.getElementById('c_timing').checked);
   document.getElementById('prpoint-field').classList.toggle('hidden', !document.getElementById('c_prpoint').checked);
+  document.getElementById('r_color-field').classList.toggle('hidden', !document.getElementById('r_color').checked);
   document.getElementById('propose-field').classList.toggle('hidden', !['propose','received','either'].includes(document.getElementById('color_mode').value));
 }
 
@@ -811,6 +848,26 @@ function buildRef(){
 
   const referrer = (document.getElementById('referrer').value||'').trim() || '{{紹介元}}';
   blocks.push(tpl('ref_body', {referrer: referrer}));
+
+  // カラーの確認（任意）
+  if(document.getElementById('r_color').checked){
+    blocks.push(tpl('ref_color', {pc: document.getElementById('r_pc').value}));
+  }
+
+  // あわせて確認すること（プロモコード・公式紹介＋ビフォーアフター）
+  const refItems = [];
+  if(document.getElementById('r_promo').checked){
+    const target = nl ? (nl + 'のフォロワー様') : 'フォロワー様';
+    refItems.push(['専用プロモーションコード', tpl('ref_promo', {target: target})]);
+  }
+  if(document.getElementById('r_feature').checked){
+    refItems.push(['公式アカウントでのご紹介', tpl('ref_feature')]);
+  }
+  if(refItems.length){
+    const body = refItems.map(function(it){ return '●' + it[0] + '\n' + it[1]; }).join('\n\n');
+    blocks.push(tpl('ref_confirm_intro') + '\n' + body);
+  }
+
   blocks.push(tpl('ref_close'));
   return blocks.join('\n\n');
 }
@@ -1019,7 +1076,7 @@ document.getElementById('manual').addEventListener('input', function(){
 document.getElementById('resetBtn').addEventListener('click', function(){
   ['name','led','sns','prpoint'].forEach(id=>{ document.getElementById(id).value=''; });
   // 既定でオフにする項目
-  ['c_greeted','c_trouble','r_apology','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
+  ['c_greeted','c_trouble','r_apology','r_color','r_promo','r_feature','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
    'c_timing','c_prpoint','c_repost']
     .forEach(id=>{ document.getElementById(id).checked=false; });
   // 既定でオンにする項目（提供OKのよく使う設定）
