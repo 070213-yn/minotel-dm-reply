@@ -480,6 +480,24 @@
         </div>
       </div>
 
+      <div style="margin-top:14px;">
+        <label class="chk" style="border-color:var(--blue);">
+          <input type="checkbox" id="c_primeday">
+          <span><span class="t">プライムデーでのご投稿をお願いする</span><span class="d">プライムデー期間に合わせて投稿時期をお願い＋「お得に買える」PRを依頼</span></span>
+        </label>
+        <div class="timing-box hidden" id="primeday-box">
+          <div class="field">
+            <label>プライムデー開催期間</label>
+            <input type="text" id="prime_period" placeholder="例：7月15日〜16日">
+          </div>
+          <div class="field">
+            <label>投稿をお願いしたい時期</label>
+            <input type="text" id="prime_post" placeholder="例：7月15日〜16日">
+          </div>
+          <div class="hint">空欄なら「〇月〇日〜〇日」のまま残ります（後で手直しできます）。</div>
+        </div>
+      </div>
+
       <div class="group-label">🎁 特典のご提案</div>
       <div class="checks">
         <label class="chk">
@@ -708,6 +726,7 @@ const TPL_DEFS = [
   {g:'提供OK', k:'ask_post',       l:'SNS投稿・タグ付け（{sns}）', v:'商品が届きましたら、{sns}にてデスク環境と一緒にご紹介いただけますと幸いです。\nご紹介の際は「@minotel_office」のメンションと、ハッシュタグ「#minotel」「#PR」の2つを必ずご記載いただけますようお願いいたします。'},
   {g:'提供OK', k:'ask_feature',    l:'公式SNS紹介の打診', v:'今回ご提供させていただくスピーカーを使ったセットアップを、公式SNS（XやInstagram）にてクレジット付きでご紹介させていただきたいのですが、問題ございませんでしょうか？\nもし可能でしたら、スピーカーを置く前と置いた後のデスクのビフォーアフターをそれぞれ撮影いただけますと幸いです。\nスピーカーに合わせてセットアップを変えていただくのも全く問題ございません。'},
   {g:'提供OK', k:'ask_timing',     l:'投稿時期のお願い（{when}）', v:'投稿の時期につきまして、もし可能であれば{when}にご投稿いただけますと嬉しいです。\n（あくまで「できれば」のお願いですので、ご都合の良いタイミングで問題ございません。）'},
+  {g:'提供OK', k:'ask_primeday',   l:'プライムデー投稿のお願い（{prime}/{post}）', v:'プライムデーが{prime}に開催予定です。\nもし可能でしたら、{post}ごろにご投稿いただくことは可能でしょうか？\nご投稿の際には、プライムデーでお安くお買い求めいただけることも含めてPRいただけますと幸いです。'},
   {g:'提供OK', k:'ask_promo',      l:'プロモコード提案（{target}）', v:'{target}に向けた、専用プロモーションコードをご用意させていただけないでしょうか？\n（Amazonにて数量限定で25%OFFになるプロモーションコードの予定です。）'},
   {g:'提供OK', k:'color_propose',  l:'カラー：こちらから提案（{pc}）', v:'提供させていただくカラーについては{pc}でよろしいでしょうか？'},
   {g:'提供OK', k:'color_received', l:'カラー：希望を聞いている（{pc}）', v:'カラーは、{pc}にてご用意させていただきます！'},
@@ -803,12 +822,16 @@ document.getElementById('color_mode').addEventListener('change', function(){
 document.getElementById('r_color').addEventListener('change', function(){
   document.getElementById('r_color-field').classList.toggle('hidden', !this.checked);
 });
+document.getElementById('c_primeday').addEventListener('change', function(){
+  document.getElementById('primeday-box').classList.toggle('hidden', !this.checked);
+});
 
 // チェック状態に合わせて補助欄（SNS欄・LED欄など）の表示を揃える
 function syncFields(){
   document.getElementById('led-field').classList.toggle('hidden', !document.getElementById('c_photo').checked);
   document.getElementById('sns-field').classList.toggle('hidden', !document.getElementById('c_post').checked);
   document.getElementById('timing-box').classList.toggle('hidden', !document.getElementById('c_timing').checked);
+  document.getElementById('primeday-box').classList.toggle('hidden', !document.getElementById('c_primeday').checked);
   document.getElementById('prpoint-field').classList.toggle('hidden', !document.getElementById('c_prpoint').checked);
   document.getElementById('r_color-field').classList.toggle('hidden', !document.getElementById('r_color').checked);
   document.getElementById('propose-field').classList.toggle('hidden', !['propose','received','either'].includes(document.getElementById('color_mode').value));
@@ -972,6 +995,11 @@ function buildOk(){
   if(rv) askItems.push(['ご紹介内容について', tpl('ask_review')]);
   if(ba && !feature) askItems.push(['ビフォーアフターの撮影', tpl('ask_beforeafter')]); // 公式SNS紹介に含まれる場合は重複回避
   if(timing) askItems.push(['投稿時期について', tpl('ask_timing', {when: timingWhen()})]);
+  if(document.getElementById('c_primeday').checked){
+    const prime = (document.getElementById('prime_period').value||'').trim() || '〇月〇日〜〇日';
+    const ppost = (document.getElementById('prime_post').value||'').trim() || '〇月〇日〜〇日';
+    askItems.push(['プライムデーでのご投稿', tpl('ask_primeday', {prime: prime, post: ppost})]);
+  }
   if(promo){
     const target = nl ? (nl + 'のフォロワー様') : 'フォロワー様';
     askItems.push(['専用プロモーションコード', tpl('ask_promo', {target: target})]);
@@ -1121,10 +1149,10 @@ document.getElementById('manual').addEventListener('input', function(){
 
 // ===== 入力クリア（応募者ごとの項目だけ。運営者名・素材リンク・マニュアルは保持）=====
 document.getElementById('resetBtn').addEventListener('click', function(){
-  ['name','led','sns','prpoint'].forEach(id=>{ document.getElementById(id).value=''; });
+  ['name','led','sns','prpoint','prime_period','prime_post'].forEach(id=>{ document.getElementById(id).value=''; });
   // 既定でオフにする項目
   ['c_followup','c_greeted','c_trouble','r_apology','r_color','r_info','r_promo','r_aff','r_feature','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
-   'c_timing','c_prpoint','c_repost']
+   'c_timing','c_primeday','c_prpoint','c_repost']
     .forEach(id=>{ document.getElementById(id).checked=false; });
   // 既定でオンにする項目（提供OKのよく使う設定）
   ['c_apology','c_post','c_feature','c_promo','c_info','m_askmedia']
