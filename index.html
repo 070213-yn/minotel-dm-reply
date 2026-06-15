@@ -377,8 +377,23 @@
           <input type="checkbox" id="r_feature">
           <span><span class="t">公式でのデスク紹介＋ビフォーアフターの確認</span><span class="d">公式紹介の可否＋ビフォーアフター撮影（DM共有OK）のお願い</span></span>
         </label>
+        <label class="chk">
+          <input type="checkbox" id="r_primeday">
+          <span><span class="t">プライムデーでのご投稿をお願いする</span><span class="d">プライムデー期間に合わせて投稿時期をお願い＋「お得に買える」PRを依頼</span></span>
+        </label>
       </div>
-      <div class="hint">どちらかをオンにすると「また、以下についても恐れ入りますがご確認をお願いいたします。」＋●の箇条書きが入ります。</div>
+      <div class="timing-box hidden" id="r_primeday-box">
+        <div class="field">
+          <label>プライムデー開催期間</label>
+          <input type="text" id="r_prime_period" placeholder="例：7月15日〜16日">
+        </div>
+        <div class="field">
+          <label>投稿をお願いしたい時期</label>
+          <input type="text" id="r_prime_post" placeholder="例：7月15日〜16日">
+        </div>
+        <div class="hint">空欄なら「〇月〇日〜〇日」のまま残ります。</div>
+      </div>
+      <div class="hint">いずれかをオンにすると「また、以下についても恐れ入りますがご確認をお願いいたします。」＋●の箇条書きが入ります。</div>
     </div>
 
     <!-- 承諾・初回オプション -->
@@ -825,6 +840,9 @@ document.getElementById('r_color').addEventListener('change', function(){
 document.getElementById('c_primeday').addEventListener('change', function(){
   document.getElementById('primeday-box').classList.toggle('hidden', !this.checked);
 });
+document.getElementById('r_primeday').addEventListener('change', function(){
+  document.getElementById('r_primeday-box').classList.toggle('hidden', !this.checked);
+});
 
 // チェック状態に合わせて補助欄（SNS欄・LED欄など）の表示を揃える
 function syncFields(){
@@ -832,6 +850,7 @@ function syncFields(){
   document.getElementById('sns-field').classList.toggle('hidden', !document.getElementById('c_post').checked);
   document.getElementById('timing-box').classList.toggle('hidden', !document.getElementById('c_timing').checked);
   document.getElementById('primeday-box').classList.toggle('hidden', !document.getElementById('c_primeday').checked);
+  document.getElementById('r_primeday-box').classList.toggle('hidden', !document.getElementById('r_primeday').checked);
   document.getElementById('prpoint-field').classList.toggle('hidden', !document.getElementById('c_prpoint').checked);
   document.getElementById('r_color-field').classList.toggle('hidden', !document.getElementById('r_color').checked);
   document.getElementById('propose-field').classList.toggle('hidden', !['propose','received','either'].includes(document.getElementById('color_mode').value));
@@ -913,6 +932,11 @@ function buildRef(){
   }
   if(document.getElementById('r_feature').checked){
     refItems.push(['公式アカウントでのご紹介', tpl('ref_feature')]);
+  }
+  if(document.getElementById('r_primeday').checked){
+    const prime = (document.getElementById('r_prime_period').value||'').trim() || '〇月〇日〜〇日';
+    const ppost = (document.getElementById('r_prime_post').value||'').trim() || '〇月〇日〜〇日';
+    refItems.push(['プライムデーでのご投稿', tpl('ask_primeday', {prime: prime, post: ppost})]);
   }
   if(refItems.length){
     const body = refItems.map(function(it){ return '●' + it[0] + '\n' + it[1]; }).join('\n\n');
@@ -1149,9 +1173,9 @@ document.getElementById('manual').addEventListener('input', function(){
 
 // ===== 入力クリア（応募者ごとの項目だけ。運営者名・素材リンク・マニュアルは保持）=====
 document.getElementById('resetBtn').addEventListener('click', function(){
-  ['name','led','sns','prpoint','prime_period','prime_post'].forEach(id=>{ document.getElementById(id).value=''; });
+  ['name','led','sns','prpoint','prime_period','prime_post','r_prime_period','r_prime_post'].forEach(id=>{ document.getElementById(id).value=''; });
   // 既定でオフにする項目
-  ['c_followup','c_greeted','c_trouble','r_apology','r_color','r_info','r_promo','r_aff','r_feature','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
+  ['c_followup','c_greeted','c_trouble','r_apology','r_color','r_info','r_promo','r_aff','r_feature','r_primeday','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
    'c_timing','c_primeday','c_prpoint','c_repost']
     .forEach(id=>{ document.getElementById(id).checked=false; });
   // 既定でオンにする項目（提供OKのよく使う設定）
