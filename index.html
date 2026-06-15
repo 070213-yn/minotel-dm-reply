@@ -355,6 +355,14 @@
         </select>
       </div>
 
+      <div class="group-label">📮 発送先情報（任意）</div>
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="r_info">
+          <span><span class="t">発送先情報の返信依頼を入れる</span><span class="d">郵便番号・住所・電話・氏名をお願いする（配送時のみ使用と明記）。提供OKと同じ文面です</span></span>
+        </label>
+      </div>
+
       <div class="group-label">📋 あわせて確認すること（任意）</div>
       <div class="checks">
         <label class="chk">
@@ -871,6 +879,11 @@ function buildRef(){
     blocks.push(tpl('ref_color', {pc: document.getElementById('r_pc').value}));
   }
 
+  // 発送先情報の依頼（任意・提供OKと同じ文面）
+  if(document.getElementById('r_info').checked){
+    blocks.push('【配送先情報】\n' + tpl('info_request'));
+  }
+
   // あわせて確認すること（プロモコード・公式紹介＋ビフォーアフター）
   const refItems = [];
   if(document.getElementById('r_promo').checked){
@@ -1110,7 +1123,7 @@ document.getElementById('manual').addEventListener('input', function(){
 document.getElementById('resetBtn').addEventListener('click', function(){
   ['name','led','sns','prpoint'].forEach(id=>{ document.getElementById(id).value=''; });
   // 既定でオフにする項目
-  ['c_followup','c_greeted','c_trouble','r_apology','r_color','r_promo','r_aff','r_feature','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
+  ['c_followup','c_greeted','c_trouble','r_apology','r_color','r_info','r_promo','r_aff','r_feature','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
    'c_timing','c_prpoint','c_repost']
     .forEach(id=>{ document.getElementById(id).checked=false; });
   // 既定でオンにする項目（提供OKのよく使う設定）
