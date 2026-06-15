@@ -687,7 +687,7 @@ const TPL_DEFS = [
   {g:'媒体確認（打診）', k:'media_close',       l:'締め', v:'何卒よろしくお願いいたします！'},
 
   {g:'紹介経由（確認）', k:'ref_greet', l:'名乗り（{owner}）', v:'はじめまして、ゲーミングアクセサリブランドminotelを運営しております、{owner}と申します。'},
-  {g:'紹介経由（確認）', k:'ref_body',  l:'紹介確認の本文（{referrer}）', v:'この度は{referrer}よりご紹介いただきまして、弊ブランドの製品をご紹介いただけるとのことでお話を伺っておりますが、お間違いなかったでしょうか？'},
+  {g:'紹介経由（確認）', k:'ref_body',  l:'紹介確認の本文（{referrer}）', v:'この度は{referrer}からのご紹介で、雲スピーカーの製品提供にご興味をお持ちいただき、誠にありがとうございます！\nぜひPRをお願いできればと思っております！'},
   {g:'紹介経由（確認）', k:'ref_color', l:'カラー確認（{pc}）', v:'提供させていただくカラーについては{pc}でよろしいでしょうか？'},
   {g:'紹介経由（確認）', k:'ref_confirm_intro', l:'あわせて確認の前置き', v:'また、以下についても恐れ入りますがご確認をお願いいたします。'},
   {g:'紹介経由（確認）', k:'ref_promo', l:'プロモコードの可否（{target}）', v:'{target}に向けて、Amazonにて数量限定で25%OFFになる専用コードのご用意を考えております。ご紹介の際にご活用いただくことは可能でしょうか？'},
@@ -879,11 +879,6 @@ function buildRef(){
     blocks.push(tpl('ref_color', {pc: document.getElementById('r_pc').value}));
   }
 
-  // 発送先情報の依頼（任意・提供OKと同じ文面）
-  if(document.getElementById('r_info').checked){
-    blocks.push('【配送先情報】\n' + tpl('info_request'));
-  }
-
   // あわせて確認すること（プロモコード・公式紹介＋ビフォーアフター）
   const refItems = [];
   if(document.getElementById('r_promo').checked){
@@ -899,6 +894,11 @@ function buildRef(){
   if(refItems.length){
     const body = refItems.map(function(it){ return '●' + it[0] + '\n' + it[1]; }).join('\n\n');
     blocks.push(tpl('ref_confirm_intro') + '\n' + body);
+  }
+
+  // 発送先情報の依頼（任意・提供OKと同じ文面）— 最後にまとめる
+  if(document.getElementById('r_info').checked){
+    blocks.push('【配送先情報】\n' + tpl('info_request'));
   }
 
   blocks.push(tpl('ref_close'));
