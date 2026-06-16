@@ -392,7 +392,11 @@
         </div>
         <div class="field">
           <label>投稿をお願いしたい時期</label>
-          <input type="text" id="r_prime_post" placeholder="例：7月15日〜16日">
+          <select id="r_prime_post">
+            <option value="7/7〜7/10">7/7〜7/10</option>
+            <option value="7/7〜7/13">7/7〜7/13</option>
+            <option value="〇月〇日〜〇日">未定（あとで手入力）</option>
+          </select>
         </div>
         <div class="hint">空欄なら「〇月〇日〜〇日」のまま残ります。</div>
       </div>
@@ -513,7 +517,11 @@
           </div>
           <div class="field">
             <label>投稿をお願いしたい時期</label>
-            <input type="text" id="prime_post" placeholder="例：7月15日〜16日">
+            <select id="prime_post">
+              <option value="7/7〜7/10">7/7〜7/10</option>
+              <option value="7/7〜7/13">7/7〜7/13</option>
+              <option value="〇月〇日〜〇日">未定（あとで手入力）</option>
+            </select>
           </div>
           <div class="hint">空欄なら「〇月〇日〜〇日」のまま残ります（後で手直しできます）。</div>
         </div>
@@ -614,7 +622,11 @@
         </div>
         <div class="field">
           <label>投稿をお願いしたい時期</label>
-          <input type="text" id="s_prime_post" placeholder="例：7/7〜7/10">
+          <select id="s_prime_post">
+            <option value="7/7〜7/10">7/7〜7/10</option>
+            <option value="7/7〜7/13">7/7〜7/13</option>
+            <option value="〇月〇日〜〇日">未定（あとで手入力）</option>
+          </select>
         </div>
         <div class="hint">空欄なら「〇月〇日〜〇日」のまま残ります。</div>
       </div>
@@ -1250,7 +1262,7 @@ document.getElementById('manual').addEventListener('input', function(){
 
 // ===== 入力クリア（応募者ごとの項目だけ。運営者名・素材リンク・マニュアルは保持）=====
 document.getElementById('resetBtn').addEventListener('click', function(){
-  ['name','led','sns','prpoint','prime_post','r_prime_post','s_prime_post'].forEach(id=>{ document.getElementById(id).value=''; });
+  ['name','led','sns','prpoint'].forEach(id=>{ document.getElementById(id).value=''; });
   // 既定でオフにする項目
   ['c_followup','c_greeted','c_trouble','r_apology','r_color','r_info','r_promo','r_aff','r_feature','r_primeday','s_primeday','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
    'c_timing','c_primeday','c_prpoint','c_repost']
