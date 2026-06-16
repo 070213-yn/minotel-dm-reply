@@ -558,11 +558,29 @@
     <!-- 発送連絡オプション -->
     <div class="section shiponly hidden" id="ship-options">
       <h2><span class="num">3</span>発送完了連絡の内容</h2>
+
       <div class="field">
+        <label>発送・到着の伝え方</label>
+        <select id="ship_mode">
+          <option value="done">本日発送が完了（情報を受け取った直後）</option>
+          <option value="today">昨日発送・本日到着の見込み</option>
+          <option value="tomorrow">昨日発送・明日到着の見込み</option>
+          <option value="day2">昨日発送・明後日到着の見込み</option>
+        </select>
+      </div>
+
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="s_material" checked>
+          <span><span class="t">Googleドライブの素材リンクを入れる</span><span class="d">紹介用の素材フォルダを案内する</span></span>
+        </label>
+      </div>
+      <div class="subfield" id="drive-field">
         <label>紹介用素材のGoogleドライブリンク</label>
         <input type="text" id="drive" value="https://drive.google.com/drive/folders/1Dr0dTOSKV9o2U6p6ZsOowakbLfaWAT_j">
         <div class="hint">空欄なら「{{Googleドライブ素材リンク}}」のまま残ります。</div>
       </div>
+
       <div class="checks">
         <label class="chk">
           <input type="checkbox" id="c_prpoint">
@@ -572,6 +590,24 @@
       <div class="subfield hidden" id="prpoint-field">
         <label>PRしてほしい点</label>
         <input type="text" id="prpoint" placeholder="例：デスクに馴染むデザインと、雲のような優しい光">
+      </div>
+
+      <div class="checks">
+        <label class="chk" style="border-color:var(--blue);">
+          <input type="checkbox" id="s_primeday">
+          <span><span class="t">プライムデー投稿のお願いを入れる</span><span class="d">開催期間に合わせて投稿時期をお願い＋「セールになる」PRを依頼</span></span>
+        </label>
+      </div>
+      <div class="timing-box hidden" id="s_primeday-box">
+        <div class="field">
+          <label>プライムデー開催期間</label>
+          <input type="text" id="s_prime_period" placeholder="例：7/7〜7/13">
+        </div>
+        <div class="field">
+          <label>投稿をお願いしたい時期</label>
+          <input type="text" id="s_prime_post" placeholder="例：7/7〜7/10">
+        </div>
+        <div class="hint">空欄なら「〇月〇日〜〇日」のまま残ります。</div>
       </div>
     </div>
 
@@ -756,6 +792,10 @@ const TPL_DEFS = [
   {g:'発送連絡', k:'ship_prpoint',  l:'PRポイント（{prpoint}）', v:'PRのポイントとしましては、{prpoint}を挙げていただけると嬉しいです！'},
   {g:'発送連絡', k:'ship_material', l:'素材リンク案内（{link}）', v:'また、ご紹介の際にご自由にお使いいただける素材を以下のGoogleドライブにご用意しておりますので、必要に応じてご活用ください☁️\nhttps://drive.google.com/drive/folders/1Dr0dTOSKV9o2U6p6ZsOowakbLfaWAT_j'},
   {g:'発送連絡', k:'ship_close',    l:'締め', v:'引き続きよろしくお願いいたします🙇‍♂️'},
+  {g:'発送連絡', k:'ship_arrive_greet', l:'冒頭（昨日発送のとき）', v:'お世話になっております。'},
+  {g:'発送連絡', k:'ship_arrive', l:'昨日発送・到着見込み（{when}）', v:'昨日発送させていただきましたので、{when}到着するかと思います🙏'},
+  {g:'発送連絡', k:'ship_primeday', l:'プライムデー投稿のお願い（{prime}/{post}）', v:'一点ご相談なのですが、Amazonプライムデーが{prime}に開催される関係で、{post}ごろにご投稿いただくことは可能でしょうか？\nもし可能な場合は、プライムデーでセールになるという宣伝もご一緒にしていただけますと幸いです。'},
+  {g:'発送連絡', k:'ship_close_confirm', l:'締め（確認をお願いするとき）', v:'ご確認のほどよろしくお願いいたします！'},
 
   {g:'お礼（投稿後）', k:'thanks_main',  l:'お礼本文', v:'この度は素敵にご紹介いただき、誠にありがとうございました✨\n投稿を拝見しまして、デスクにとても馴染んでいて、見ているだけで嬉しくなりました…！☁️'},
   {g:'お礼（投稿後）', k:'thanks_repost',l:'リポスト許可のお願い', v:'差し支えなければ、こちらの投稿を公式アカウントでもクレジット付きでご紹介させていただけますでしょうか？'},
@@ -843,6 +883,12 @@ document.getElementById('c_primeday').addEventListener('change', function(){
 document.getElementById('r_primeday').addEventListener('change', function(){
   document.getElementById('r_primeday-box').classList.toggle('hidden', !this.checked);
 });
+document.getElementById('s_primeday').addEventListener('change', function(){
+  document.getElementById('s_primeday-box').classList.toggle('hidden', !this.checked);
+});
+document.getElementById('s_material').addEventListener('change', function(){
+  document.getElementById('drive-field').classList.toggle('hidden', !this.checked);
+});
 
 // チェック状態に合わせて補助欄（SNS欄・LED欄など）の表示を揃える
 function syncFields(){
@@ -851,6 +897,8 @@ function syncFields(){
   document.getElementById('timing-box').classList.toggle('hidden', !document.getElementById('c_timing').checked);
   document.getElementById('primeday-box').classList.toggle('hidden', !document.getElementById('c_primeday').checked);
   document.getElementById('r_primeday-box').classList.toggle('hidden', !document.getElementById('r_primeday').checked);
+  document.getElementById('s_primeday-box').classList.toggle('hidden', !document.getElementById('s_primeday').checked);
+  document.getElementById('drive-field').classList.toggle('hidden', !document.getElementById('s_material').checked);
   document.getElementById('prpoint-field').classList.toggle('hidden', !document.getElementById('c_prpoint').checked);
   document.getElementById('r_color-field').classList.toggle('hidden', !document.getElementById('r_color').checked);
   document.getElementById('propose-field').classList.toggle('hidden', !['propose','received','either'].includes(document.getElementById('color_mode').value));
@@ -1048,18 +1096,38 @@ function buildShip(){
   const nl = nameLine();
   if(nl) blocks.push(nl);
 
-  blocks.push(tpl('ship_thanks'));
-  blocks.push(tpl('ship_send'));
+  // 発送・到着の伝え方
+  const mode = document.getElementById('ship_mode').value;
+  if(mode === 'done'){
+    blocks.push(tpl('ship_thanks'));
+    blocks.push(tpl('ship_send'));
+  }else{
+    const when = (mode === 'today') ? '本日' : (mode === 'tomorrow') ? '明日' : '明後日';
+    blocks.push(tpl('ship_arrive_greet'));
+    blocks.push(tpl('ship_arrive', {when: when}));
+  }
 
   if(document.getElementById('c_prpoint').checked){
     const p = (document.getElementById('prpoint').value||'').trim() || '{{PRして欲しい点}}';
     blocks.push(tpl('ship_prpoint', {prpoint: p}));
   }
 
-  const link = (document.getElementById('drive').value||'').trim() || '{{Googleドライブ素材リンク}}';
-  blocks.push(tpl('ship_material', {link: link}));
+  // プライムデー投稿のお願い
+  const primeday = document.getElementById('s_primeday').checked;
+  if(primeday){
+    const prime = (document.getElementById('s_prime_period').value||'').trim() || '〇月〇日〜〇日';
+    const ppost = (document.getElementById('s_prime_post').value||'').trim() || '〇月〇日〜〇日';
+    blocks.push(tpl('ship_primeday', {prime: prime, post: ppost}));
+  }
 
-  blocks.push(tpl('ship_close'));
+  // 素材リンク（任意）
+  if(document.getElementById('s_material').checked){
+    const link = (document.getElementById('drive').value||'').trim() || '{{Googleドライブ素材リンク}}';
+    blocks.push(tpl('ship_material', {link: link}));
+  }
+
+  // 締め（確認をお願いする内容があるときは「ご確認のほど」に）
+  blocks.push(primeday ? tpl('ship_close_confirm') : tpl('ship_close'));
   return blocks.join('\n\n');
 }
 
@@ -1173,15 +1241,16 @@ document.getElementById('manual').addEventListener('input', function(){
 
 // ===== 入力クリア（応募者ごとの項目だけ。運営者名・素材リンク・マニュアルは保持）=====
 document.getElementById('resetBtn').addEventListener('click', function(){
-  ['name','led','sns','prpoint','prime_period','prime_post','r_prime_period','r_prime_post'].forEach(id=>{ document.getElementById(id).value=''; });
+  ['name','led','sns','prpoint','prime_period','prime_post','r_prime_period','r_prime_post','s_prime_period','s_prime_post'].forEach(id=>{ document.getElementById(id).value=''; });
   // 既定でオフにする項目
-  ['c_followup','c_greeted','c_trouble','r_apology','r_color','r_info','r_promo','r_aff','r_feature','r_primeday','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
+  ['c_followup','c_greeted','c_trouble','r_apology','r_color','r_info','r_promo','r_aff','r_feature','r_primeday','s_primeday','m_apology','m_photo','m_reply_img','m_askphoto','c_photo','c_photo2','c_sample','c_beforeafter','c_review',
    'c_timing','c_primeday','c_prpoint','c_repost']
     .forEach(id=>{ document.getElementById(id).checked=false; });
   // 既定でオンにする項目（提供OKのよく使う設定）
-  ['c_apology','c_post','c_feature','c_promo','c_info','m_askmedia']
+  ['c_apology','c_post','c_feature','c_promo','c_info','m_askmedia','s_material']
     .forEach(id=>{ document.getElementById(id).checked=true; });
   document.getElementById('color_mode').value = 'received';
+  document.getElementById('ship_mode').value = 'done';
   syncFields();
   document.getElementById('name').focus();
   render();
