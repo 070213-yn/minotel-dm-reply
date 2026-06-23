@@ -379,7 +379,7 @@
         </label>
         <label class="chk">
           <input type="checkbox" id="r_primeday">
-          <span><span class="t">プライムデーでのご投稿をお願いする</span><span class="d">プライムデー期間に合わせて投稿時期をお願い＋「お得に買える」PRを依頼</span></span>
+          <span><span class="t">プライムデーでのご投稿をお願いする</span><span class="d">プライムデー期間に合わせて投稿時期をお願い＋30%OFFセールのPRを依頼</span></span>
         </label>
       </div>
       <div class="timing-box hidden" id="r_primeday-box">
@@ -505,7 +505,7 @@
       <div style="margin-top:14px;">
         <label class="chk" style="border-color:var(--blue);">
           <input type="checkbox" id="c_primeday">
-          <span><span class="t">プライムデーでのご投稿をお願いする</span><span class="d">プライムデー期間に合わせて投稿時期をお願い＋「お得に買える」PRを依頼</span></span>
+          <span><span class="t">プライムデーでのご投稿をお願いする</span><span class="d">プライムデー期間に合わせて投稿時期をお願い＋30%OFFセールのPRを依頼</span></span>
         </label>
         <div class="timing-box hidden" id="primeday-box">
           <div class="field">
@@ -798,7 +798,7 @@ const TPL_DEFS = [
   {g:'提供OK', k:'ask_post',       l:'SNS投稿・タグ付け（{sns}）', v:'商品が届きましたら、{sns}にてデスク環境と一緒にご紹介いただけますと幸いです。\nご紹介の際は「@minotel_office」のメンションと、ハッシュタグ「#minotel」「#PR」の2つを必ずご記載いただけますようお願いいたします。'},
   {g:'提供OK', k:'ask_feature',    l:'公式SNS紹介の打診', v:'今回ご提供させていただくスピーカーを使ったセットアップを、公式SNS（XやInstagram）にてクレジット付きでご紹介させていただきたいのですが、問題ございませんでしょうか？\nもし可能でしたら、スピーカーを置く前と置いた後のデスクのビフォーアフターをそれぞれ撮影いただけますと幸いです。\nスピーカーに合わせてセットアップを変えていただくのも全く問題ございません。'},
   {g:'提供OK', k:'ask_timing',     l:'投稿時期のお願い（{when}）', v:'投稿の時期につきまして、もし可能であれば{when}にご投稿いただけますと嬉しいです。\n（あくまで「できれば」のお願いですので、ご都合の良いタイミングで問題ございません。）'},
-  {g:'提供OK', k:'ask_primeday',   l:'プライムデー投稿のお願い（{prime}/{post}）', v:'プライムデーが{prime}に開催予定です。\nもし可能でしたら、{post}ごろにご投稿いただくことは可能でしょうか？\nご投稿の際には、プライムデーでお安くお買い求めいただけることも含めてPRいただけますと幸いです。'},
+  {g:'提供OK', k:'ask_primeday',   l:'プライムデー投稿のお願い（{prime}/{post}）', v:'【ご投稿時期】\nプライムデーが{prime}に開催予定です。\nもし可能でしたら、{post}ごろにご紹介いただくことは可能でしょうか？\nご投稿の際には、プライムデーで30%OFFのセール中という内容も含めてご紹介いただけますと幸いです。'},
   {g:'提供OK', k:'ask_promo',      l:'プロモコード提案（{target}）', v:'{target}に向けた、専用プロモーションコードをご用意させていただけないでしょうか？\n（Amazonにて数量限定で25%OFFになるプロモーションコードの予定です。）'},
   {g:'提供OK', k:'color_propose',  l:'カラー：こちらから提案（{pc}）', v:'提供させていただくカラーについては{pc}でよろしいでしょうか？'},
   {g:'提供OK', k:'color_received', l:'カラー：希望を聞いている（{pc}）', v:'カラーは、{pc}にてご用意させていただきます！'},
@@ -1002,14 +1002,16 @@ function buildRef(){
   if(document.getElementById('r_feature').checked){
     refItems.push(['公式アカウントでのご紹介', tpl('ref_feature')]);
   }
-  if(document.getElementById('r_primeday').checked){
-    const prime = (document.getElementById('r_prime_period').value||'').trim() || '〇月〇日〜〇日';
-    const ppost = (document.getElementById('r_prime_post').value||'').trim() || '〇月〇日〜〇日';
-    refItems.push(['プライムデーでのご投稿', tpl('ask_primeday', {prime: prime, post: ppost})]);
-  }
   if(refItems.length){
     const body = refItems.map(function(it){ return '●' + it[0] + '\n' + it[1]; }).join('\n\n');
     blocks.push(tpl('ref_confirm_intro') + '\n' + body);
+  }
+
+  // プライムデーは独立した【ご投稿時期】ブロックとして出す
+  if(document.getElementById('r_primeday').checked){
+    const prime = (document.getElementById('r_prime_period').value||'').trim() || '〇月〇日〜〇日';
+    const ppost = (document.getElementById('r_prime_post').value||'').trim() || '〇月〇日〜〇日';
+    blocks.push(tpl('ask_primeday', {prime: prime, post: ppost}));
   }
 
   // 発送先情報の依頼（任意・提供OKと同じ文面）— 最後にまとめる
@@ -1088,11 +1090,6 @@ function buildOk(){
   if(rv) askItems.push(['ご紹介内容について', tpl('ask_review')]);
   if(ba && !feature) askItems.push(['ビフォーアフターの撮影', tpl('ask_beforeafter')]); // 公式SNS紹介に含まれる場合は重複回避
   if(timing) askItems.push(['投稿時期について', tpl('ask_timing', {when: timingWhen()})]);
-  if(document.getElementById('c_primeday').checked){
-    const prime = (document.getElementById('prime_period').value||'').trim() || '〇月〇日〜〇日';
-    const ppost = (document.getElementById('prime_post').value||'').trim() || '〇月〇日〜〇日';
-    askItems.push(['プライムデーでのご投稿', tpl('ask_primeday', {prime: prime, post: ppost})]);
-  }
   if(promo){
     const target = nl ? (nl + 'のフォロワー様') : 'フォロワー様';
     askItems.push(['専用プロモーションコード', tpl('ask_promo', {target: target})]);
@@ -1100,6 +1097,13 @@ function buildOk(){
   if(askItems.length){
     const body = askItems.map(function(it){ return '●' + it[0] + '\n' + it[1]; }).join('\n\n');
     blocks.push('【ご紹介・ご依頼について】\n' + body);
+  }
+
+  // プライムデーは独立した【ご投稿時期】ブロックとして出す
+  if(document.getElementById('c_primeday').checked){
+    const prime = (document.getElementById('prime_period').value||'').trim() || '〇月〇日〜〇日';
+    const ppost = (document.getElementById('prime_post').value||'').trim() || '〇月〇日〜〇日';
+    blocks.push(tpl('ask_primeday', {prime: prime, post: ppost}));
   }
 
   // 製品マニュアル案内
